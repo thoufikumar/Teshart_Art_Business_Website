@@ -1,0 +1,10 @@
+{
+  "description": "Enables customers to order custom portrait artwork through a seamless four-step process with responsive design and real-time order tracking.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
