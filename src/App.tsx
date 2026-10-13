@@ -40,6 +40,10 @@ import ArtworkImage from './components/shared/ArtworkImage'
 import OrderTimeline from './components/shared/OrderTimeline'
 import ProgressStepper from './components/shared/ProgressStepper'
 
+import uploadImageIllustration from './assets/Other assets/Upload your image .jpg'
+import drawByHandIllustration from './assets/Other assets/we draw it by hand.jpg'
+import lastingGiftIllustration from './assets/Other assets/give lasting gifts.jpg'
+
 const selCls = (on: boolean) =>
   `rounded-lg border text-left transition-colors ${
     on ? 'border-brown bg-sand/70 ring-1 ring-brown' : 'border-line bg-white hover:border-line-strong'
@@ -55,117 +59,200 @@ const Row = ({ l, v }: { l: string; v: string }) => (
 /* ---------- Homepage ---------- */
 function Header({ go }: { go: (v: RouteId) => void }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-paper/90 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between">
-        <Logo onClick={() => go('home')} />
-        <nav className="flex items-center gap-5 text-sm text-muted md:gap-8">
-          <a href="#how" className="hidden hover:text-ink sm:block">
+    <header className="sticky top-0 z-30 box-border w-full border-b border-line/70 bg-ivory/90 px-[20px] backdrop-blur sm:px-[32px] lg:px-[60px]">
+      <div className="grid min-h-[68px] w-full max-w-none grid-cols-[1fr_auto] items-center sm:min-h-[76px] sm:grid-cols-[1fr_auto_1fr] lg:min-h-[88px]">
+        <Logo
+          onClick={() => go('home')}
+          className="justify-self-start !text-[18px] font-medium lg:!text-[20px]"
+        />
+        <nav
+          aria-label="Primary"
+          className="hidden items-center justify-self-center gap-[32px] text-[16px] whitespace-nowrap text-muted sm:flex lg:gap-[44px] lg:text-[16.5px]"
+        >
+          <a href="#how" className="transition-colors hover:text-ink">
             Home
           </a>
-          <a href="#why" className="hidden hover:text-ink sm:block">
+          <a href="#why" className="transition-colors hover:text-ink">
             Why us
           </a>
-          <a href="#works" className="hidden hover:text-ink sm:block">
+          <a href="#works" className="transition-colors hover:text-ink">
             Our works
           </a>
-          <Button onClick={() => go('order')} className="h-9 px-4">
-            Order now
-          </Button>
         </nav>
-      </Container>
+        <Button
+          onClick={() => go('order')}
+          className="h-[40px] justify-self-end px-[18px] !text-[15px] sm:h-[44px] sm:px-[20px] lg:h-[48px] lg:px-[24px] lg:!text-[16px]"
+        >
+          Order now
+        </Button>
+      </div>
     </header>
   )
 }
 
 function Hero({ go }: { go: (v: RouteId) => void }) {
-  const artRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const onScroll = () => {
-      if (artRef.current && window.innerWidth < 768) {
-        artRef.current.style.transform = `translateY(${window.scrollY * 0.15}px)`
-      } else if (artRef.current) {
-        artRef.current.style.transform = ''
-      }
+  const scrollToWorks = () => {
+    const el = document.getElementById('works')
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
     }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-ivory via-paper to-sand">
-      <Container className="grid items-center gap-10 py-14 md:grid-cols-[1fr_1.1fr] md:py-24">
-        <div className="relative z-10">
-          <h1 className="font-serif text-[52px] leading-[0.98] tracking-tight md:text-[80px]">
-            Some moments deserve <em className="text-brown">more</em> than a photo.
-          </h1>
-          <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-muted">
-            Hand-drawn portraits of the people you love, made to last.
-          </p>
-          <Button onClick={() => go('order')} className="mt-8 h-11 px-6">
-            Create your portrait <Icon name="arrow" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-ivory via-sand/45 to-paper">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col items-center px-5 pt-10 pb-0 sm:px-8 sm:pt-12 lg:px-14 lg:pt-16 xl:px-20">
+        {/* Centered Editorial Headline (+15%) */}
+        <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5875rem,5.29vw,5.75rem)] leading-[1.05] tracking-[-0.015em] text-ink md:max-w-none">
+          <span className="md:block md:whitespace-nowrap">Turning your timeless moments</span>{' '}
+          <span className="md:block md:whitespace-nowrap">
+            into beautiful <em className="font-serif italic text-brown">keepsake.</em>
+          </span>
+        </h1>
+
+        {/* Primary & Secondary CTAs immediately below the heading (+15%) */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3.5 sm:mt-7 sm:gap-4">
+          <Button onClick={() => go('order')} className="h-[50.6px] px-[27.6px] !text-[16.1px]">
+            Create your portrait <Icon name="arrow" className="size-[18.4px]" />
           </Button>
-          <div className="mt-8 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {(['raw-child-sketch', 'raw-woman-sketchpad', 'raw-couple-closeup'] as const).map(id => (
-                <ArtworkImage
-                  key={id}
-                  artworkId={id}
-                  alt="Customer portrait"
-                  className="size-8 rounded-full border-2 border-paper"
-                />
-              ))}
-            </div>
-            <div>
-              <p className="text-xs text-muted">350+ happy customers</p>
-              <div className="flex items-center gap-1">
-                <Stars />
-                <span className="text-xs font-medium">4.9/5</span>
-              </div>
-            </div>
+          <Button
+            variant="secondary"
+            onClick={scrollToWorks}
+            className="h-[50.6px] border-line-strong/90 bg-ivory/80 px-[27.6px] !text-[16.1px] hover:bg-sand/70"
+          >
+            Explore our works
+          </Button>
+        </div>
+
+        {/* Three-Frame Portrait Gallery Composition (-10%) */}
+        <div className="relative mt-8 flex w-full max-w-[1188px] items-end justify-center sm:mt-10 lg:mt-12">
+          {/* Ambient soft warm studio glow behind frames */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-[12%] top-[8%] bottom-0 rounded-full bg-brown/10 blur-3xl"
+          />
+
+          {/* 1. Left: Framed portrait of a woman, rotated slightly counterclockwise */}
+          <div className="relative z-10 w-[28.8%] max-w-[351px] shrink-0 translate-x-[12%] translate-y-[11%] -rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_20px_48px_rgba(28,25,21,0.26)] sm:w-[27%] sm:translate-x-[10%] lg:w-[26.1%]">
+            <ArtworkImage
+              artworkId="framed-woman"
+              alt="Framed hand-drawn pencil portrait of a smiling woman"
+              className="block aspect-[3/4] w-full scale-[1.06]"
+              loading="eager"
+            />
+          </div>
+
+          {/* 2. Center: Framed portrait of a child, upright and visually dominant */}
+          <div className="relative z-20 w-[37.8%] max-w-[441px] shrink-0 translate-y-[8.5%] overflow-hidden rounded-[2px] shadow-[0_28px_64px_rgba(28,25,21,0.34)] sm:w-[35.1%] lg:w-[33.3%]">
+            <ArtworkImage
+              artworkId="framed-child"
+              alt="Framed hand-drawn pencil portrait of a child"
+              className="block aspect-[3/4] w-full scale-[1.14]"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </div>
+
+          {/* 3. Right: Framed family portrait, rotated slightly clockwise */}
+          <div className="relative z-10 w-[28.8%] max-w-[351px] shrink-0 -translate-x-[12%] translate-y-[11%] rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_20px_48px_rgba(28,25,21,0.26)] sm:w-[27%] sm:-translate-x-[10%] lg:w-[26.1%]">
+            <ArtworkImage
+              artworkId="framed-family"
+              alt="Framed hand-drawn family pencil portrait"
+              className="block aspect-[3/4] w-full scale-[1.07]"
+              loading="eager"
+            />
           </div>
         </div>
-        <div ref={artRef} className="relative will-change-transform">
-          <ArtworkImage
-            artworkId="framed-couple"
-            alt="Framed hand-drawn pencil portraits"
-            className="w-full rounded-sm"
+
+        {/* Progressive bottom blur overlay confined to the hero artwork bottom region */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[28%] sm:h-[30%]"
+        >
+          <div
+            className="absolute inset-0 backdrop-blur-[3px]"
+            style={{
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)',
+              maskImage:
+                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)',
+            }}
+          />
+          <div
+            className="absolute inset-0 backdrop-blur-[7px]"
+            style={{
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)',
+              maskImage:
+                'linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)',
+            }}
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-paper/55 to-paper backdrop-blur-[12px]"
+            style={{
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)',
+              maskImage:
+                'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)',
+            }}
           />
         </div>
-      </Container>
+      </div>
     </section>
   )
 }
 
 function How() {
   const steps = [
-    ['img', 'Share your photo', 'Choose a favourite moment you\u2019d love to turn into a portrait.'],
-    ['pen', 'We draw it by hand', 'Every portrait is crafted with care and attention.'],
-    ['gift', 'Give a lasting gift', 'Receive a beautiful portrait they\u2019ll always treasure.'],
-  ] as const
+    {
+      img: uploadImageIllustration,
+      title: 'Share your image',
+      desc: 'Choose a favourite moment you\u2019d love to turn into a portrait.',
+    },
+    {
+      img: drawByHandIllustration,
+      title: 'We draw it by hand',
+      desc: 'Every portrait is crafted with care and attention.',
+    },
+    {
+      img: lastingGiftIllustration,
+      title: 'Give a lasting gift',
+      desc: 'Receive a beautiful portrait they\u2019ll always treasure.',
+    },
+  ]
 
   return (
-    <section id="how" className="bg-paper py-20 md:py-28">
-      <Container className="text-center">
-        <Eyebrow>How it works</Eyebrow>
-        <h2 className="mt-3 font-serif text-4xl md:text-5xl">Your photo, to their heart.</h2>
-        <div className="mt-14 grid gap-12 sm:grid-cols-3">
-          {steps.map(([ic, t, d], i) => (
-            <div key={t} className="flex flex-col items-center">
+    <section id="how" className="box-border w-full bg-paper py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-[62px]">
+      <div className="w-full text-center">
+        <Eyebrow className="text-xs sm:text-sm tracking-[0.2em]">How it works</Eyebrow>
+        <h2 className="mt-4 font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[64px] leading-[1.1] tracking-tight">
+          Your photo, to their heart.
+        </h2>
+        <div className="mt-14 sm:mt-16 lg:mt-20 grid gap-10 sm:grid-cols-3 lg:gap-14 xl:gap-16">
+          {steps.map((step, i) => (
+            <div key={step.title} className="flex flex-col items-center">
               <div className="relative">
-                <span className="absolute -left-4 -top-3">
-                  <StepNum n={i + 1} />
+                <span className="absolute -left-2 -top-2 z-10 grid size-9 sm:size-10 place-items-center rounded-full bg-brown text-sm sm:text-base font-semibold text-white shadow-md ring-4 ring-paper">
+                  {i + 1}
                 </span>
-                <span className="grid size-14 place-items-center rounded-full border border-line bg-ivory text-brown">
-                  <Icon name={ic} className="size-6" />
-                </span>
+                <div className="size-48 sm:size-56 md:size-60 lg:size-64 xl:size-72 rounded-full overflow-hidden border-2 border-line/80 bg-white shadow-md transition-transform duration-300 hover:scale-[1.02]">
+                  <img
+                    src={step.img}
+                    alt={step.title}
+                    className="size-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-              <h3 className="mt-5 text-[15px] font-medium">{t}</h3>
-              <p className="mt-2 max-w-[220px] text-sm leading-relaxed text-muted">{d}</p>
+              <h3 className="mt-6 sm:mt-7 font-serif text-2xl sm:text-3xl lg:text-[32px] font-medium tracking-tight text-ink">
+                {step.title}
+              </h3>
+              <p className="mt-3 max-w-[280px] sm:max-w-[340px] text-base sm:text-lg leading-relaxed text-muted">
+                {step.desc}
+              </p>
             </div>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   )
 }
