@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { type RouteId, ROUTES, resolveRouteFromPath, type CheckoutStepIndex } from './config/routes'
-import { type ArtworkId } from './domain/artworkRegistry'
+import { useEffect, useRef, useState } from "react"
+import {
+  type RouteId,
+  ROUTES,
+  resolveRouteFromPath,
+  type CheckoutStepIndex,
+} from "./config/routes"
+import { type ArtworkId } from "./domain/artworkRegistry"
 import {
   FINISH_OPTIONS,
   PORTRAIT_TYPES,
@@ -13,40 +18,46 @@ import {
   type FinishOptionId,
   type PortraitSizeId,
   type PortraitTypeId,
-} from './domain/catalogue'
-import { PAYMENT_METHODS, type DeliveryDetails } from './domain/order'
-import { formatInr, getFramingPriceDifferenceInr, getVariantPriceInr } from './domain/pricing'
+} from "./domain/catalogue"
+import { PAYMENT_METHODS, type DeliveryDetails } from "./domain/order"
+import {
+  formatInr,
+  getFramingPriceDifferenceInr,
+  getVariantPriceInr,
+} from "./domain/pricing"
 import {
   sanitizePincodeInput,
   validateDeliveryDetails,
   validatePhotoFile,
   type DeliveryValidationErrors,
-} from './domain/validation'
-import { OrderProvider, useOrder } from './state/OrderContext'
+} from "./domain/validation"
+import { OrderProvider, useOrder } from "./state/OrderContext"
 
-import Button from './components/ui/Button'
-import Card from './components/ui/Card'
-import CheckDot from './components/ui/CheckDot'
-import Eyebrow from './components/ui/Eyebrow'
-import Field from './components/ui/Field'
-import Icon from './components/ui/Icon'
-import Logo from './components/ui/Logo'
-import Radio from './components/ui/Radio'
-import SectionTitle from './components/ui/SectionTitle'
-import Stars from './components/ui/Stars'
-import StepNum from './components/ui/StepNum'
-import Container from './components/layout/Container'
-import ArtworkImage from './components/shared/ArtworkImage'
-import OrderTimeline from './components/shared/OrderTimeline'
-import ProgressStepper from './components/shared/ProgressStepper'
+import Button from "./components/ui/Button"
+import Card from "./components/ui/Card"
+import CheckDot from "./components/ui/CheckDot"
+import Eyebrow from "./components/ui/Eyebrow"
+import Field from "./components/ui/Field"
+import Icon from "./components/ui/Icon"
+import Logo from "./components/ui/Logo"
+import Radio from "./components/ui/Radio"
+import SectionTitle from "./components/ui/SectionTitle"
+import Stars from "./components/ui/Stars"
+import StepNum from "./components/ui/StepNum"
+import Container from "./components/layout/Container"
+import ArtworkImage from "./components/shared/ArtworkImage"
+import OrderTimeline from "./components/shared/OrderTimeline"
+import ProgressStepper from "./components/shared/ProgressStepper"
 
-import uploadImageIllustration from './assets/Other assets/Upload your image .jpg'
-import drawByHandIllustration from './assets/Other assets/we draw it by hand.jpg'
-import lastingGiftIllustration from './assets/Other assets/give lasting gifts.jpg'
+import uploadImageIllustration from "./assets/Other assets/Upload image.svg"
+import drawByHandIllustration from "./assets/Other assets/we draw by hand.svg"
+import lastingGiftIllustration from "./assets/Other assets/Gift to your loved one.svg"
 
 const selCls = (on: boolean) =>
   `rounded-lg border text-left transition-colors ${
-    on ? 'border-brown bg-sand/70 ring-1 ring-brown' : 'border-line bg-white hover:border-line-strong'
+    on
+      ? "border-brown bg-sand/70 ring-1 ring-brown"
+      : "border-line bg-white hover:border-line-strong"
   }`
 
 const Row = ({ l, v }: { l: string; v: string }) => (
@@ -62,7 +73,7 @@ function Header({ go }: { go: (v: RouteId) => void }) {
     <header className="sticky top-0 z-30 box-border w-full border-b border-line/70 bg-ivory/90 px-[20px] backdrop-blur sm:px-[32px] lg:px-[60px]">
       <div className="grid min-h-[68px] w-full max-w-none grid-cols-[1fr_auto] items-center sm:min-h-[76px] sm:grid-cols-[1fr_auto_1fr] lg:min-h-[88px]">
         <Logo
-          onClick={() => go('home')}
+          onClick={() => go("home")}
           className="justify-self-start !text-[18px] font-medium lg:!text-[20px]"
         />
         <nav
@@ -80,7 +91,7 @@ function Header({ go }: { go: (v: RouteId) => void }) {
           </a>
         </nav>
         <Button
-          onClick={() => go('order')}
+          onClick={() => go("order")}
           className="h-[40px] justify-self-end px-[18px] !text-[15px] sm:h-[44px] sm:px-[20px] lg:h-[48px] lg:px-[24px] lg:!text-[16px]"
         >
           Order now
@@ -92,9 +103,9 @@ function Header({ go }: { go: (v: RouteId) => void }) {
 
 function Hero({ go }: { go: (v: RouteId) => void }) {
   const scrollToWorks = () => {
-    const el = document.getElementById('works')
+    const el = document.getElementById("works")
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
+      el.scrollIntoView({ behavior: "smooth" })
     }
   }
 
@@ -103,15 +114,21 @@ function Hero({ go }: { go: (v: RouteId) => void }) {
       <div className="mx-auto flex w-full max-w-[1680px] flex-col items-center px-5 pt-10 pb-0 sm:px-8 sm:pt-12 lg:px-14 lg:pt-16 xl:px-20">
         {/* Centered Editorial Headline (+15%) */}
         <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5875rem,5.29vw,5.75rem)] leading-[1.05] tracking-[-0.015em] text-ink md:max-w-none">
-          <span className="md:block md:whitespace-nowrap">Turning your timeless moments</span>{' '}
           <span className="md:block md:whitespace-nowrap">
-            into beautiful <em className="font-serif italic text-brown">keepsake.</em>
+            Turning your timeless moments
+          </span>{" "}
+          <span className="md:block md:whitespace-nowrap">
+            into beautiful{" "}
+            <em className="font-serif italic text-brown">keepsake.</em>
           </span>
         </h1>
 
         {/* Primary & Secondary CTAs immediately below the heading (+15%) */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3.5 sm:mt-7 sm:gap-4">
-          <Button onClick={() => go('order')} className="h-[50.6px] px-[27.6px] !text-[16.1px]">
+          <Button
+            onClick={() => go("order")}
+            className="h-[50.6px] px-[27.6px] !text-[16.1px]"
+          >
             Create your portrait <Icon name="arrow" className="size-[18.4px]" />
           </Button>
           <Button
@@ -172,27 +189,27 @@ function Hero({ go }: { go: (v: RouteId) => void }) {
             className="absolute inset-0 backdrop-blur-[3px]"
             style={{
               WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)',
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)",
               maskImage:
-                'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)',
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)",
             }}
           />
           <div
             className="absolute inset-0 backdrop-blur-[7px]"
             style={{
               WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)',
+                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)",
               maskImage:
-                'linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)',
+                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)",
             }}
           />
           <div
             className="absolute inset-0 bg-gradient-to-b from-transparent via-paper/55 to-paper backdrop-blur-[12px]"
             style={{
               WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)',
+                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)",
               maskImage:
-                'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)',
+                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)",
             }}
           />
         </div>
@@ -205,48 +222,53 @@ function How() {
   const steps = [
     {
       img: uploadImageIllustration,
-      title: 'Share your image',
-      desc: 'Choose a favourite moment you\u2019d love to turn into a portrait.',
+      title: "Share your image",
+      desc: "Choose a favourite moment you\u2019d love to turn into a portrait.",
     },
     {
       img: drawByHandIllustration,
-      title: 'We draw it by hand',
-      desc: 'Every portrait is crafted with care and attention.',
+      title: "We draw by hand",
+      desc: "Every portrait is crafted with care and attention.",
     },
     {
       img: lastingGiftIllustration,
-      title: 'Give a lasting gift',
-      desc: 'Receive a beautiful portrait they\u2019ll always treasure.',
+      title: "Gift to your loved one",
+      desc: "Receive a beautiful portrait they\u2019ll always treasure.",
     },
   ]
 
   return (
-    <section id="how" className="box-border w-full bg-paper py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-[62px]">
+    <section
+      id="how"
+      className="box-border w-full bg-paper py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-[62px]"
+    >
       <div className="w-full text-center">
-        <Eyebrow className="text-xs sm:text-sm tracking-[0.2em]">How it works</Eyebrow>
-        <h2 className="mt-4 font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[64px] leading-[1.1] tracking-tight">
+        <Eyebrow className="!text-[13.8px] sm:!text-[16.1px] tracking-[0.2em]">
+          How it works
+        </Eyebrow>
+        <h2 className="mt-4 font-serif text-[41.4px] sm:text-[55.2px] md:text-[69px] lg:text-[73.6px] leading-[1.1] tracking-tight">
           Your photo, to their heart.
         </h2>
         <div className="mt-14 sm:mt-16 lg:mt-20 grid gap-10 sm:grid-cols-3 lg:gap-14 xl:gap-16">
           {steps.map((step, i) => (
             <div key={step.title} className="flex flex-col items-center">
               <div className="relative">
-                <span className="absolute -left-2 -top-2 z-10 grid size-9 sm:size-10 place-items-center rounded-full bg-brown text-sm sm:text-base font-semibold text-white shadow-md ring-4 ring-paper">
+                <span className="absolute left-1/2 -top-2.5 z-10 grid size-[41.4px] sm:size-[46px] -translate-x-1/2 place-items-center rounded-full bg-brown text-[16.1px] sm:text-[18.4px] font-semibold text-white shadow-md ring-4 ring-paper">
                   {i + 1}
                 </span>
-                <div className="size-48 sm:size-56 md:size-60 lg:size-64 xl:size-72 rounded-full overflow-hidden border-2 border-line/80 bg-white shadow-md transition-transform duration-300 hover:scale-[1.02]">
+                <div className="size-48 sm:size-56 md:size-60 lg:size-64 xl:size-72 transition-transform duration-300 hover:scale-[1.02]">
                   <img
                     src={step.img}
                     alt={step.title}
-                    className="size-full object-cover"
+                    className="size-full object-contain"
                     loading="lazy"
                   />
                 </div>
               </div>
-              <h3 className="mt-6 sm:mt-7 font-serif text-2xl sm:text-3xl lg:text-[32px] font-medium tracking-tight text-ink">
+              <h3 className="mt-6 sm:mt-7 font-serif text-[27.6px] sm:text-[34.5px] lg:text-[36.8px] font-medium tracking-tight text-ink">
                 {step.title}
               </h3>
-              <p className="mt-3 max-w-[280px] sm:max-w-[340px] text-base sm:text-lg leading-relaxed text-muted">
+              <p className="mt-3 max-w-[322px] sm:max-w-[391px] text-[18.4px] sm:text-[20.7px] leading-relaxed text-muted">
                 {step.desc}
               </p>
             </div>
@@ -258,74 +280,139 @@ function How() {
 }
 
 function Works({ go }: { go: (v: RouteId) => void }) {
-  const slides: ArtworkId[] = ['framed-couple', 'framed-girl-crown', 'framed-family']
+  const slides: ArtworkId[] = [
+    "framed-couple",
+    "framed-girl-crown",
+    "framed-family",
+  ]
   const [i, setI] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+
+  // Active carousel autoplay (pauses on user hover/touch)
+  useEffect(() => {
+    if (isPaused) return
+    const timer = setInterval(() => {
+      setI((prev) => (prev + 1) % slides.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [isPaused, slides.length])
 
   return (
-    <section id="works" className="bg-ivory py-20 md:py-28">
-      <Container className="grid items-center gap-12 md:grid-cols-[0.8fr_1.4fr]">
-        <div>
-          <Eyebrow>Our works</Eyebrow>
-          <h2 className="mt-3 font-serif text-5xl leading-[1] md:text-6xl">
-            Made from moments <em className="text-brown">that matter.</em>
-          </h2>
-          <p className="mt-5 text-sm leading-relaxed text-muted">
-            Real people. Real stories.
-            <br />
-            Hand-drawn with care.
-          </p>
-          <Button onClick={() => go('order')} className="mt-7 h-10 px-5">
-            Explore our works <Icon name="arrow" />
-          </Button>
-          <div className="mt-8 flex gap-4">
-            <button
-              type="button"
-              aria-label="Previous"
-              onClick={() => setI((i + 2) % slides.length)}
-              className="text-muted hover:text-ink"
+    <section
+      id="works"
+      className="relative flex flex-col justify-center bg-ivory py-14 sm:py-18 lg:py-0 lg:min-h-[calc(100svh-var(--header-height))]"
+    >
+      <div className="mx-auto box-border flex w-full max-w-[1400px] flex-1 flex-col justify-center px-5 sm:px-8 lg:px-12 xl:px-16">
+        <div className="grid items-center gap-10 md:gap-12 lg:grid-cols-[38%_62%] xl:gap-16">
+          {/* Left Editorial Content (35-40% width) */}
+          <div className="flex flex-col items-start">
+            <Eyebrow className="!text-[12px] sm:!text-[13px] tracking-[0.2em]">Our works</Eyebrow>
+            <h2 className="mt-3.5 sm:mt-4 font-serif text-[clamp(2.5rem,4.4vw,4.5rem)] leading-[1.04] tracking-[-0.015em] text-ink">
+              Made from moments{" "}
+              <em className="font-serif italic text-brown">that matter.</em>
+            </h2>
+            <p className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-[19px] leading-relaxed text-muted max-w-[34ch]">
+              Real people. Real stories.
+              <br />
+              Hand-drawn with care.
+            </p>
+            <Button
+              onClick={() => go("order")}
+              className="mt-8 sm:mt-9 h-[50px] sm:h-[54px] px-7 sm:px-8 !text-[16px] sm:!text-[17px] font-medium shadow-sm hover:shadow transition-all"
             >
-              <Icon name="back" />
-            </button>
-            <button
-              type="button"
-              aria-label="Next"
-              onClick={() => setI((i + 1) % slides.length)}
-              className="text-muted hover:text-ink"
-            >
-              <Icon name="arrow" />
-            </button>
+              Explore our works <Icon name="arrow" className="size-5" />
+            </Button>
+          </div>
+
+          {/* Right Artwork Carousel (60-65% width) */}
+          <div
+            className="relative flex flex-col items-center justify-center w-full"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setIsPaused(false)}
+          >
+            {/* Subtle warm ambient backdrop glow behind the showcase */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-[12%] inset-y-[8%] rounded-full bg-brown/8 blur-3xl"
+            />
+
+            {/* Active Carousel Stage with adaptive sizing & smooth transition */}
+            <div className="relative flex w-full items-center justify-center overflow-hidden py-4 sm:py-6 min-h-[380px] sm:min-h-[460px] md:min-h-[520px] lg:min-h-[560px] xl:min-h-[600px]">
+              {/* Previous Arrow Button — positioned in the carousel */}
+              <button
+                type="button"
+                aria-label="Previous artwork"
+                onClick={() => setI((i + slides.length - 1) % slides.length)}
+                className="absolute left-2 sm:left-4 z-30 grid size-11 sm:size-12 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
+              >
+                <Icon name="back" className="size-5" />
+              </button>
+
+              {/* All slides rendered with smooth transition and self-adapting dimensions */}
+              <div className="relative flex w-full items-center justify-center h-full min-h-[360px] sm:min-h-[430px] md:min-h-[490px] lg:min-h-[540px] xl:min-h-[580px]">
+                {slides.map((slide, idx) => {
+                  const isActive = idx === i
+                  const diff = (idx - i + slides.length) % slides.length
+                  const isNext = diff === 1
+                  const isPrev = diff === slides.length - 1
+
+                  let transformClass = "scale-95 opacity-0 pointer-events-none z-10"
+                  if (isActive) {
+                    transformClass = "scale-100 opacity-100 translate-x-0 z-20 pointer-events-auto"
+                  } else if (isNext) {
+                    transformClass = "scale-95 opacity-0 translate-x-10 sm:translate-x-14 pointer-events-none z-10"
+                  } else if (isPrev) {
+                    transformClass = "scale-95 opacity-0 -translate-x-10 sm:-translate-x-14 pointer-events-none z-10"
+                  }
+
+                  return (
+                    <div
+                      key={slide}
+                      className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out ${transformClass}`}
+                    >
+                      <ArtworkImage
+                        artworkId={slide}
+                        alt="Featured hand-drawn portrait"
+                        className="max-h-[360px] sm:max-h-[430px] md:max-h-[490px] lg:max-h-[540px] xl:max-h-[580px] w-auto max-w-[85%] md:max-w-[82%] object-contain rounded-[3px] shadow-[0_24px_54px_rgba(28,25,21,0.22)] ring-1 ring-black/5 transition-transform duration-500 hover:scale-[1.01]"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Next Arrow Button — positioned in the carousel */}
+              <button
+                type="button"
+                aria-label="Next artwork"
+                onClick={() => setI((i + 1) % slides.length)}
+                className="absolute right-2 sm:right-4 z-30 grid size-11 sm:size-12 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
+              >
+                <Icon name="arrow" className="size-5" />
+              </button>
+            </div>
+
+            {/* Pagination indicators */}
+            <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2">
+              {slides.map((_, j) => (
+                <button
+                  key={j}
+                  type="button"
+                  aria-label={`Go to artwork slide ${j + 1}`}
+                  onClick={() => setI(j)}
+                  className={`h-2 rounded-full transition-all duration-500 ${
+                    j === i
+                      ? "w-7 bg-brown"
+                      : "w-2 bg-line-strong hover:bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        <div>
-          <div className="relative flex items-center justify-center gap-4 overflow-hidden">
-            <ArtworkImage
-              artworkId={slides[(i + 2) % slides.length]}
-              alt="Portrait"
-              className="hidden h-56 shrink-0 opacity-60 md:block"
-            />
-            <ArtworkImage
-              artworkId={slides[i]}
-              alt="Featured hand-drawn portrait"
-              className="h-64 shrink-0 shadow-card md:h-80"
-            />
-            <ArtworkImage
-              artworkId={slides[(i + 1) % slides.length]}
-              alt="Portrait"
-              className="hidden h-56 shrink-0 opacity-60 md:block"
-            />
-          </div>
-          <div className="mt-6 flex justify-center gap-1.5">
-            {slides.map((_, j) => (
-              <span
-                key={j}
-                className={`h-1.5 rounded-full transition-all ${
-                  j === i ? 'w-4 bg-brown' : 'w-1.5 bg-line-strong'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </Container>
+      </div>
     </section>
   )
 }
@@ -335,13 +422,22 @@ function Testimonials() {
     <section id="why" className="bg-sand/60 py-20 md:py-24">
       <Container className="text-center">
         <Eyebrow>What our customers say</Eyebrow>
-        <h2 className="mt-3 font-serif text-4xl md:text-5xl">Their words mean everything.</h2>
+        <h2 className="mt-3 font-serif text-4xl md:text-5xl">
+          Their words mean everything.
+        </h2>
         <div className="mt-12 grid gap-5 text-left md:grid-cols-3">
-          {TESTIMONIALS.map(item => (
-            <figure key={item.id} className="rounded-lg border border-line bg-ivory p-6 shadow-card">
+          {TESTIMONIALS.map((item) => (
+            <figure
+              key={item.id}
+              className="rounded-lg border border-line bg-ivory p-6 shadow-card"
+            >
               <Stars count={item.rating} />
-              <blockquote className="mt-4 text-sm leading-relaxed">{item.quote}</blockquote>
-              <figcaption className="mt-5 text-xs font-medium">{item.customerName}</figcaption>
+              <blockquote className="mt-4 text-sm leading-relaxed">
+                {item.quote}
+              </blockquote>
+              <figcaption className="mt-5 text-xs font-medium">
+                {item.customerName}
+              </figcaption>
             </figure>
           ))}
         </div>
@@ -352,8 +448,11 @@ function Testimonials() {
 
 function CreateSection({ go }: { go: (v: RouteId) => void }) {
   const { draft, pricing, selectPortraitType, selectSize } = useOrder()
-  const availableSizes = getAvailableSizesForType(draft.configuration.portraitType)
-  const field = 'h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink'
+  const availableSizes = getAvailableSizesForType(
+    draft.configuration.portraitType,
+  )
+  const field =
+    "h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink"
 
   return (
     <section className="bg-paper py-20 md:py-28">
@@ -364,16 +463,15 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
             A gift they&rsquo;ll <em className="text-brown">always cherish.</em>
           </h2>
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted">
-            Upload your photo, choose your details and we&rsquo;ll take care of the rest.
+            Upload your photo, choose your details and we&rsquo;ll take care of
+            the rest.
           </p>
           <div className="mt-10 grid max-w-md grid-cols-3 gap-6 text-xs text-muted">
-            {(
-              [
-                ['pen', 'Hand-drawn with care'],
-                ['truck', 'Safe delivery across India'],
-                ['heart', 'A meaningful gift, always'],
-              ] as const
-            ).map(([ic, l]) => (
+            {([
+              ["pen", "Hand-drawn with care"],
+              ["truck", "Safe delivery across India"],
+              ["heart", "A meaningful gift, always"],
+            ] as const).map(([ic, l]) => (
               <div key={l}>
                 <Icon name={ic} className="size-5 text-brown" />
                 <p className="mt-2 leading-snug">{l}</p>
@@ -385,7 +483,7 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
           <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
             <button
               type="button"
-              onClick={() => go('order')}
+              onClick={() => go("order")}
               className="flex aspect-square flex-col items-center justify-center rounded-md border border-dashed border-line-strong bg-white text-center text-muted hover:bg-sand/40"
             >
               <Icon name="img" className="size-6" />
@@ -396,10 +494,12 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
               <select
                 aria-label="Select portrait type"
                 value={draft.configuration.portraitType}
-                onChange={e => selectPortraitType(e.target.value as PortraitTypeId)}
+                onChange={(e) =>
+                  selectPortraitType(e.target.value as PortraitTypeId)
+                }
                 className={field}
               >
-                {PORTRAIT_TYPES.map(t => (
+                {PORTRAIT_TYPES.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.title}
                   </option>
@@ -408,10 +508,10 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
               <select
                 aria-label="Select size"
                 value={draft.configuration.size}
-                onChange={e => selectSize(e.target.value as PortraitSizeId)}
+                onChange={(e) => selectSize(e.target.value as PortraitSizeId)}
                 className={field}
               >
-                {availableSizes.map(s => (
+                {availableSizes.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.id} ({s.dimensionsCm})
                   </option>
@@ -424,7 +524,9 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
           <div className="mt-5 space-y-1.5 border-t border-line pt-4 text-sm">
             <div className="flex justify-between">
               <span className="text-muted">Estimated price</span>
-              <span className="font-medium">{formatInr(pricing.totalAmountInr)}</span>
+              <span className="font-medium">
+                {formatInr(pricing.totalAmountInr)}
+              </span>
             </div>
             <div className="flex justify-between text-xs text-muted">
               <span>Pay now (advance)</span>
@@ -435,7 +537,7 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
               <span>{formatInr(pricing.remainingOnDeliveryInr)}</span>
             </div>
           </div>
-          <Button onClick={() => go('order')} className="mt-5 h-11 w-full">
+          <Button onClick={() => go("order")} className="mt-5 h-11 w-full">
             Create my portrait <Icon name="arrow" />
           </Button>
           <div className="mt-4 flex justify-center gap-6 text-[11px] text-muted">
@@ -459,14 +561,20 @@ function Footer({ go }: { go: (v: RouteId) => void }) {
     <footer className="border-t border-line bg-paper">
       <Container className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
         <div>
-          <Logo onClick={() => go('home')} />
-          <p className="mt-2 text-xs text-muted">Hand-drawn portraits for your special moments.</p>
+          <Logo onClick={() => go("home")} />
+          <p className="mt-2 text-xs text-muted">
+            Hand-drawn portraits for your special moments.
+          </p>
         </div>
         <nav className="flex gap-6 text-sm text-muted">
           <a href="#how">Home</a>
           <a href="#why">Why us</a>
           <a href="#works">Our works</a>
-          <button type="button" onClick={() => go('system')} className="hover:text-ink">
+          <button
+            type="button"
+            onClick={() => go("system")}
+            className="hover:text-ink"
+          >
             Design system
           </button>
         </nav>
@@ -477,7 +585,8 @@ function Footer({ go }: { go: (v: RouteId) => void }) {
 
 /* ---------- Order Flow Steps (Temporary Compatibility Adapter using Phase 1 Domain) ---------- */
 function Step1() {
-  const { draft, selectPortraitType, setUploadedPhotoUrl, selectSamplePhoto } = useOrder()
+  const { draft, selectPortraitType, setUploadedPhotoUrl, selectSamplePhoto } =
+    useOrder()
   const [uploadError, setUploadError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -485,7 +594,7 @@ function Step1() {
     if (!file) return
     const check = validatePhotoFile(file)
     if (!check.valid) {
-      setUploadError(check.error ?? 'Invalid file')
+      setUploadError(check.error ?? "Invalid file")
       return
     }
     setUploadError(null)
@@ -499,7 +608,8 @@ function Step1() {
   return (
     <>
       <h1 className="font-serif text-[42px] leading-[1.02] md:text-5xl">
-        Let&rsquo;s begin with your <em className="text-brown">favourite</em> photo.
+        Let&rsquo;s begin with your <em className="text-brown">favourite</em>{" "}
+        photo.
       </h1>
       <p className="mt-3 max-w-md text-sm text-muted">
         Upload a clear photo and choose the type of portrait you&rsquo;d like.
@@ -512,13 +622,14 @@ function Step1() {
             onClick={() => fileRef.current?.click()}
             className="flex min-h-[150px] flex-col items-center justify-center rounded-lg border border-dashed border-line-strong bg-white p-4 text-center hover:bg-ivory"
           >
-            {draft.photo.sourceType === 'upload' && draft.photo.previewUrl ? (
+            {draft.photo.sourceType === "upload" && draft.photo.previewUrl ? (
               <img
                 src={draft.photo.previewUrl}
                 alt="Selected photo"
                 className="max-h-32 rounded object-contain"
               />
-            ) : draft.photo.sourceType === 'sample' && draft.photo.sampleArtworkId ? (
+            ) : draft.photo.sourceType === "sample" &&
+              draft.photo.sampleArtworkId ? (
               <ArtworkImage
                 artworkId={draft.photo.sampleArtworkId}
                 className="max-h-32 rounded object-contain"
@@ -536,11 +647,15 @@ function Step1() {
             type="file"
             accept="image/png,image/jpeg"
             hidden
-            onChange={e => handleFileChange(e.target.files?.[0])}
+            onChange={(e) => handleFileChange(e.target.files?.[0])}
           />
           <div className="self-center text-xs text-muted">
             <p className="mb-3 text-ink">A few tips for best results</p>
-            {['Use a clear, well lit photo', 'Avoid heavy filters', 'Make sure faces are visible'].map(t => (
+            {[
+              "Use a clear, well lit photo",
+              "Avoid heavy filters",
+              "Make sure faces are visible",
+            ].map((t) => (
               <p key={t} className="mb-2 flex items-center gap-2">
                 <Icon name="check" className="size-3.5 text-brown" />
                 {t}
@@ -555,17 +670,24 @@ function Step1() {
         )}
         <p className="mb-2 mt-5 text-xs text-muted">Or try a sample</p>
         <div className="grid grid-cols-5 gap-2">
-          {SAMPLE_PHOTOS.map(s => {
+          {SAMPLE_PHOTOS.map((s) => {
             const isSelected =
-              draft.photo.sourceType === 'sample' && draft.photo.sampleArtworkId === s.artworkId
+              draft.photo.sourceType === "sample" &&
+              draft.photo.sampleArtworkId === s.artworkId
             return (
               <button
                 type="button"
                 key={s.id}
                 onClick={() => selectSamplePhoto(s.artworkId)}
-                className={`overflow-hidden rounded-md ${isSelected ? 'ring-2 ring-brown' : ''}`}
+                className={`overflow-hidden rounded-md ${
+                  isSelected ? "ring-2 ring-brown" : ""
+                }`}
               >
-                <ArtworkImage artworkId={s.artworkId} alt={s.label} className="aspect-[6/5] w-full" />
+                <ArtworkImage
+                  artworkId={s.artworkId}
+                  alt={s.label}
+                  className="aspect-[6/5] w-full"
+                />
               </button>
             )
           })}
@@ -581,7 +703,7 @@ function Step1() {
       <section className="mt-8">
         <SectionTitle n={2}>Choose portrait type</SectionTitle>
         <div className="space-y-2.5">
-          {PORTRAIT_TYPES.map(t => {
+          {PORTRAIT_TYPES.map((t) => {
             const isSelected = draft.configuration.portraitType === t.id
             return (
               <button
@@ -612,7 +734,11 @@ function Step1() {
 
 function Step2() {
   const { draft, selectSize, selectFinish } = useOrder()
-  const { portraitType, size: selectedSize, finish: selectedFinish } = draft.configuration
+  const {
+    portraitType,
+    size: selectedSize,
+    finish: selectedFinish,
+  } = draft.configuration
   const availableSizes = getAvailableSizesForType(portraitType)
   const framingDiff = getFramingPriceDifferenceInr(portraitType, selectedSize)
 
@@ -629,7 +755,7 @@ function Step2() {
         </div>
         <div className="text-center">
           <ArtworkImage
-            artworkId={draft.photo.sampleArtworkId ?? 'raw-child-sketch'}
+            artworkId={draft.photo.sampleArtworkId ?? "raw-child-sketch"}
             alt="Your photo"
             className="aspect-square w-20 rounded-md md:w-24"
           />
@@ -651,12 +777,16 @@ function Step2() {
         </SectionTitle>
         <div
           className={`grid grid-cols-1 gap-3 ${
-            availableSizes.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'
+            availableSizes.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"
           }`}
         >
-          {availableSizes.map(s => {
+          {availableSizes.map((s) => {
             const isSelected = selectedSize === s.id
-            const unframedPrice = getVariantPriceInr(portraitType, s.id, 'unframed')
+            const unframedPrice = getVariantPriceInr(
+              portraitType,
+              s.id,
+              "unframed",
+            )
             return (
               <button
                 type="button"
@@ -680,7 +810,9 @@ function Step2() {
                     </span>
                   )}
                 </span>
-                <span className="font-serif text-2xl">{formatInr(unframedPrice)}</span>
+                <span className="font-serif text-2xl">
+                  {formatInr(unframedPrice)}
+                </span>
                 <span className="text-[11px] text-muted">{s.description}</span>
               </button>
             )
@@ -700,39 +832,53 @@ function Step2() {
           Choose your finish
         </SectionTitle>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {FINISH_OPTIONS.map((f: { id: FinishOptionId; title: string; description: string; artworkId: ArtworkId }) => {
-            const isSelected = selectedFinish === f.id
-            const variantPrice = getVariantPriceInr(portraitType, selectedSize, f.id)
-            return (
-              <button
-                type="button"
-                key={f.id}
-                onClick={() => selectFinish(f.id)}
-                aria-pressed={isSelected}
-                className={`relative flex flex-col p-2.5 ${selCls(isSelected)}`}
-              >
-                <span className="absolute right-3 top-3 z-10">
-                  {isSelected ? <CheckDot /> : <Radio on={false} />}
-                </span>
-                <ArtworkImage
-                  artworkId={f.artworkId}
-                  alt={f.title}
-                  className="aspect-[3/2] w-full rounded"
-                />
-                <span className="mt-3 text-sm font-medium">{f.title}</span>
-                <span className="text-[11px] text-muted">{f.description}</span>
-                <span className="mt-2 font-serif text-lg text-brown">
-                  {f.id === 'unframed'
-                    ? `Included (${formatInr(variantPrice)})`
-                    : `${formatInr(variantPrice)} (+ ${formatInr(framingDiff)})`}
-                </span>
-              </button>
-            )
-          })}
+          {FINISH_OPTIONS.map(
+            (f: {
+              id: FinishOptionId
+              title: string
+              description: string
+              artworkId: ArtworkId
+            }) => {
+              const isSelected = selectedFinish === f.id
+              const variantPrice = getVariantPriceInr(
+                portraitType,
+                selectedSize,
+                f.id,
+              )
+              return (
+                <button
+                  type="button"
+                  key={f.id}
+                  onClick={() => selectFinish(f.id)}
+                  aria-pressed={isSelected}
+                  className={`relative flex flex-col p-2.5 ${selCls(isSelected)}`}
+                >
+                  <span className="absolute right-3 top-3 z-10">
+                    {isSelected ? <CheckDot /> : <Radio on={false} />}
+                  </span>
+                  <ArtworkImage
+                    artworkId={f.artworkId}
+                    alt={f.title}
+                    className="aspect-[3/2] w-full rounded"
+                  />
+                  <span className="mt-3 text-sm font-medium">{f.title}</span>
+                  <span className="text-[11px] text-muted">
+                    {f.description}
+                  </span>
+                  <span className="mt-2 font-serif text-lg text-brown">
+                    {f.id === "unframed"
+                      ? `Included (${formatInr(variantPrice)})`
+                      : `${formatInr(variantPrice)} (+ ${formatInr(framingDiff)})`}
+                  </span>
+                </button>
+              )
+            },
+          )}
         </div>
         <p className="mt-4 flex items-center gap-2 rounded-lg bg-sand/60 px-4 py-3 text-xs text-muted">
           <Icon name="gift" className="size-4" />
-          All portraits are hand-drawn with care. Colours may slightly vary from the preview.
+          All portraits are hand-drawn with care. Colours may slightly vary from
+          the preview.
         </p>
       </section>
     </>
@@ -758,7 +904,7 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
             icon="user"
             label="Full name"
             value={d.fullName}
-            onChange={v => updateDelivery({ fullName: v })}
+            onChange={(v) => updateDelivery({ fullName: v })}
             placeholder="Enter your full name"
             error={errors.fullName}
           />
@@ -766,7 +912,7 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
             icon="phone"
             label="Mobile number"
             value={d.mobile}
-            onChange={v => updateDelivery({ mobile: v })}
+            onChange={(v) => updateDelivery({ mobile: v })}
             placeholder="+91 98765 43210"
             error={errors.mobile}
           />
@@ -789,7 +935,7 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
             icon="pin"
             label="Address"
             value={d.addressLine}
-            onChange={v => updateDelivery({ addressLine: v })}
+            onChange={(v) => updateDelivery({ addressLine: v })}
             placeholder="House no., street, area"
             error={errors.addressLine}
           />
@@ -798,7 +944,7 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
               icon="city"
               label="City"
               value={d.city}
-              onChange={v => updateDelivery({ city: v })}
+              onChange={(v) => updateDelivery({ city: v })}
               placeholder="e.g. Coimbatore"
               error={errors.city}
             />
@@ -806,7 +952,7 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
               icon="bank"
               label="State"
               value={d.state}
-              onChange={v => updateDelivery({ state: v })}
+              onChange={(v) => updateDelivery({ state: v })}
               placeholder="e.g. Tamil Nadu"
               error={errors.state}
             />
@@ -815,7 +961,9 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
             icon="note"
             label="Pincode"
             value={d.pincode}
-            onChange={v => updateDelivery({ pincode: sanitizePincodeInput(v) })}
+            onChange={(v) =>
+              updateDelivery({ pincode: sanitizePincodeInput(v) })
+            }
             placeholder="Enter 6 digit pincode"
             error={errors.pincode}
             className="sm:w-1/2"
@@ -824,18 +972,21 @@ function Step3({ errors }: { errors: DeliveryValidationErrors }) {
       </section>
       <section className="mt-8">
         <SectionTitle n={3}>
-          Delivery instructions <span className="text-sm font-normal text-muted">(optional)</span>
+          Delivery instructions{" "}
+          <span className="text-sm font-normal text-muted">(optional)</span>
         </SectionTitle>
         <div className="rounded-lg border border-line bg-white p-3 focus-within:border-brown">
           <textarea
             value={d.instructions}
             maxLength={200}
-            onChange={e => updateDelivery({ instructions: e.target.value })}
+            onChange={(e) => updateDelivery({ instructions: e.target.value })}
             rows={3}
             placeholder="e.g. Best time to deliver, nearby landmark, etc."
             className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted/70"
           />
-          <p className="text-right text-[11px] text-muted">{d.instructions.length}/200</p>
+          <p className="text-right text-[11px] text-muted">
+            {d.instructions.length}/200
+          </p>
         </div>
       </section>
     </>
@@ -874,7 +1025,11 @@ function Step4({ edit }: { edit: (s: CheckoutStepIndex) => void }) {
         </SectionTitle>
         <div className="divide-y divide-line rounded-lg border border-line bg-white">
           <div className="flex items-center gap-4 p-3">
-            <ArtworkImage artworkId={t.artworkId} alt={t.title} className="aspect-[13/9] w-14 rounded" />
+            <ArtworkImage
+              artworkId={t.artworkId}
+              alt={t.title}
+              className="aspect-[13/9] w-14 rounded"
+            />
             <div className="flex-1">
               <p className="text-sm font-medium">Portrait type</p>
               <p className="text-xs text-muted">{t.title}</p>
@@ -891,16 +1046,24 @@ function Step4({ edit }: { edit: (s: CheckoutStepIndex) => void }) {
                 {s.id} ({s.dimensionsCm})
               </p>
             </div>
-            <span className="text-sm">{formatInr(pricing.unframedBasePriceInr)}</span>
+            <span className="text-sm">
+              {formatInr(pricing.unframedBasePriceInr)}
+            </span>
           </div>
           <div className="flex items-center gap-4 p-3">
-            <ArtworkImage artworkId={f.artworkId} alt={f.title} className="aspect-[3/2] w-14 rounded" />
+            <ArtworkImage
+              artworkId={f.artworkId}
+              alt={f.title}
+              className="aspect-[3/2] w-14 rounded"
+            />
             <div className="flex-1">
               <p className="text-sm font-medium">Finish</p>
               <p className="text-xs text-muted">{f.title}</p>
             </div>
             <span className="text-sm">
-              {pricing.framingDiffInr > 0 ? `+ ${formatInr(pricing.framingDiffInr)}` : 'Included'}
+              {pricing.framingDiffInr > 0
+                ? `+ ${formatInr(pricing.framingDiffInr)}`
+                : "Included"}
             </span>
           </div>
         </div>
@@ -908,10 +1071,17 @@ function Step4({ edit }: { edit: (s: CheckoutStepIndex) => void }) {
       <section className="mt-8">
         <SectionTitle n={2}>Price details</SectionTitle>
         <div className="space-y-2 text-sm">
-          <Row l={`${t.title} (${s.id}, ${f.shortLabel})`} v={formatInr(pricing.productPriceInr)} />
+          <Row
+            l={`${t.title} (${s.id}, ${f.shortLabel})`}
+            v={formatInr(pricing.productPriceInr)}
+          />
           <Row
             l="Shipping"
-            v={pricing.shippingFeeInr > 0 ? formatInr(pricing.shippingFeeInr) : 'Included'}
+            v={
+              pricing.shippingFeeInr > 0
+                ? formatInr(pricing.shippingFeeInr)
+                : "Included"
+            }
           />
           <div className="flex justify-between border-t border-line pt-3 font-medium">
             <span>Total amount</span>
@@ -935,8 +1105,12 @@ function Step4({ edit }: { edit: (s: CheckoutStepIndex) => void }) {
       </section>
       <section className="mt-8">
         <SectionTitle n={3}>Choose payment method</SectionTitle>
-        <div className="space-y-2.5" role="radiogroup" aria-label="Payment method">
-          {PAYMENT_METHODS.map(pm => {
+        <div
+          className="space-y-2.5"
+          role="radiogroup"
+          aria-label="Payment method"
+        >
+          {PAYMENT_METHODS.map((pm) => {
             const isSelected = draft.paymentMethod === pm.id
             return (
               <button
@@ -962,7 +1136,13 @@ function Step4({ edit }: { edit: (s: CheckoutStepIndex) => void }) {
   )
 }
 
-function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStepIndex) => void }) {
+function Aside({
+  step,
+  edit,
+}: {
+  step: CheckoutStepIndex
+  edit: (s: CheckoutStepIndex) => void
+}) {
   const { draft, pricing } = useOrder()
   const t = getPortraitType(draft.configuration.portraitType)
   const s = getPortraitSize(draft.configuration.size)
@@ -970,15 +1150,17 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
   const d = draft.delivery
 
   const perks = [
-    ['shield', 'Safe and secure delivery', 'across India'],
-    ['heart', 'Handle with care', 'packaging'],
-    ['gift', 'A meaningful gift,', 'always'],
+    ["shield", "Safe and secure delivery", "across India"],
+    ["heart", "Handle with care", "packaging"],
+    ["gift", "A meaningful gift,", "always"],
   ] as const
 
   if (step < 2) {
     return (
       <Card className="p-5">
-        <p className="text-xs uppercase tracking-[0.16em] text-muted">Your order</p>
+        <p className="text-xs uppercase tracking-[0.16em] text-muted">
+          Your order
+        </p>
         <ArtworkImage
           artworkId={step === 0 ? t.artworkId : t.previewArtworkId}
           alt="Portrait preview"
@@ -996,7 +1178,9 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
         {step === 1 && (
           <div className="mt-4 flex justify-between border-t border-line pt-3">
             <span className="text-sm text-muted">Estimated price</span>
-            <span className="font-serif text-2xl">{formatInr(pricing.productPriceInr)}</span>
+            <span className="font-serif text-2xl">
+              {formatInr(pricing.productPriceInr)}
+            </span>
           </div>
         )}
       </Card>
@@ -1015,7 +1199,11 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
             />
             <div className="flex-1 text-right">
               <p className="text-sm font-medium">Your order</p>
-              <button type="button" onClick={() => edit(1)} className="text-xs text-brown">
+              <button
+                type="button"
+                onClick={() => edit(1)}
+                className="text-xs text-brown"
+              >
                 Edit
               </button>
             </div>
@@ -1027,7 +1215,9 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
           </div>
           <div className="mt-4 flex justify-between border-t border-line pt-3 text-sm">
             <span className="text-muted">Price</span>
-            <span className="font-medium">{formatInr(pricing.productPriceInr)}</span>
+            <span className="font-medium">
+              {formatInr(pricing.productPriceInr)}
+            </span>
           </div>
           <div className="mt-4 flex gap-3 rounded-lg bg-sand/70 p-3">
             <Icon name="truck" className="size-5 text-brown" />
@@ -1059,7 +1249,11 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
       <Card className="p-5">
         <div className="flex justify-between text-sm">
           <span className="font-medium">Preview</span>
-          <button type="button" onClick={() => edit(1)} className="text-xs text-brown">
+          <button
+            type="button"
+            onClick={() => edit(1)}
+            className="text-xs text-brown"
+          >
             Edit
           </button>
         </div>
@@ -1070,37 +1264,43 @@ function Aside({ step, edit }: { step: CheckoutStepIndex; edit: (s: CheckoutStep
         />
         <p className="mt-3 flex gap-2 text-[11px] text-muted">
           <Icon name="info" className="size-3.5 shrink-0" />
-          This is a preview. The final artwork may have slight variations as it is hand-drawn.
+          This is a preview. The final artwork may have slight variations as it
+          is hand-drawn.
         </p>
       </Card>
       <Card className="p-5">
         <div className="flex justify-between text-sm">
           <span className="font-medium">Delivery to</span>
-          <button type="button" onClick={() => edit(2)} className="text-xs text-brown">
+          <button
+            type="button"
+            onClick={() => edit(2)}
+            className="text-xs text-brown"
+          >
             Edit
           </button>
         </div>
         <div className="mt-3 flex gap-2 text-xs text-muted">
           <Icon name="pin" className="size-4 shrink-0 text-brown" />
           <p>
-            <span className="font-medium text-ink">{d.fullName || 'Thoufik Umer A'}</span>
+            <span className="font-medium text-ink">
+              {d.fullName || "Thoufik Umer A"}
+            </span>
             <br />
-            {d.addressLine || '23C/379, Sri Eshwar College of Engineering'}, {d.city || 'Coimbatore'},{' '}
-            {d.state || 'Tamil Nadu'} – {d.pincode || '641202'}
+            {d.addressLine || "23C/379, Sri Eshwar College of Engineering"},{" "}
+            {d.city || "Coimbatore"}, {d.state || "Tamil Nadu"} –{" "}
+            {d.pincode || "641202"}
             <br />
-            {d.mobile || '+91 98765 43210'}
+            {d.mobile || "+91 98765 43210"}
           </p>
         </div>
       </Card>
       <Card className="space-y-4 p-5">
-        {(
-          [
-            ['truck', 'Estimated delivery', '7–10 days'],
-            ['shield', 'Safe and secure payment', '100% secure transactions'],
-            ['gift', 'A meaningful gift', 'Hand-drawn with care'],
-            ['box', 'Pan India delivery', 'Tracked and insured'],
-          ] as const
-        ).map(([ic, a, b]) => (
+        {([
+          ["truck", "Estimated delivery", "7–10 days"],
+          ["shield", "Safe and secure payment", "100% secure transactions"],
+          ["gift", "A meaningful gift", "Hand-drawn with care"],
+          ["box", "Pan India delivery", "Tracked and insured"],
+        ] as const).map(([ic, a, b]) => (
           <div key={a} className="flex gap-3 text-xs">
             <Icon name={ic} className="size-5 text-brown" />
             <p className="text-muted">
@@ -1130,25 +1330,29 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
       if (!validation.valid) return
     }
     if (step === 3) {
-      go('confirm')
+      go("confirm")
       return
     }
     setStep((step + 1) as CheckoutStepIndex)
   }
 
   const footer = [
-    { l: null, cta: 'Continue to next step' },
+    { l: null, cta: "Continue to next step" },
     {
-      l: ['Estimated price', formatInr(pricing.productPriceInr), null] as const,
-      cta: 'Continue to next step',
-    },
-    {
-      l: ['Total amount', formatInr(pricing.totalAmountInr), '(Advance payment at next step)'] as const,
-      cta: 'Continue to review',
+      l: ["Estimated price", formatInr(pricing.productPriceInr), null] as const,
+      cta: "Continue to next step",
     },
     {
       l: [
-        'Total amount',
+        "Total amount",
+        formatInr(pricing.totalAmountInr),
+        "(Advance payment at next step)",
+      ] as const,
+      cta: "Continue to review",
+    },
+    {
+      l: [
+        "Total amount",
         formatInr(pricing.totalAmountInr),
         `You'll pay ${formatInr(pricing.advancePayableInr)} now (advance)`,
       ] as const,
@@ -1160,7 +1364,7 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
     <div className="min-h-screen bg-gradient-to-b from-paper to-sand/60">
       <header className="sticky top-0 z-30 border-b border-line/70 bg-paper/90 backdrop-blur">
         <Container className="flex h-16 items-center justify-between">
-          <Logo onClick={() => go('home')} />
+          <Logo onClick={() => go("home")} />
           <Icon name="bag" className="size-5" />
         </Container>
       </header>
@@ -1196,8 +1400,12 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
             {footer.l && (
               <div>
                 <p className="text-xs text-muted">{footer.l[0]}</p>
-                <p className="font-serif text-2xl leading-none md:text-3xl">{footer.l[1]}</p>
-                {footer.l[2] && <p className="text-[11px] text-muted">{footer.l[2]}</p>}
+                <p className="font-serif text-2xl leading-none md:text-3xl">
+                  {footer.l[1]}
+                </p>
+                {footer.l[2] && (
+                  <p className="text-[11px] text-muted">{footer.l[2]}</p>
+                )}
               </div>
             )}
           </div>
@@ -1219,7 +1427,13 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
 }
 
 /* ---------- Post-order ---------- */
-function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) => void }) {
+function PostOrder({
+  mode,
+  go,
+}: {
+  mode: "confirm" | "track"
+  go: (v: RouteId) => void
+}) {
   const { draft, pricing } = useOrder()
   const t = getPortraitType(draft.configuration.portraitType)
   const s = getPortraitSize(draft.configuration.size)
@@ -1229,22 +1443,24 @@ function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) =
     <div className="min-h-screen bg-gradient-to-b from-paper to-sand/60">
       <header className="border-b border-line/70">
         <Container className="flex h-16 items-center justify-between">
-          <Logo onClick={() => go('home')} />
+          <Logo onClick={() => go("home")} />
           <Icon name="bag" className="size-5" />
         </Container>
       </header>
       <Container className="grid gap-10 py-14 lg:grid-cols-[minmax(0,1fr)_380px]">
         <main>
-          {mode === 'confirm' ? (
+          {mode === "confirm" ? (
             <>
               <span className="grid size-14 place-items-center rounded-full bg-success/10 text-success">
                 <Icon name="check" className="size-7" />
               </span>
               <h1 className="mt-6 font-serif text-5xl leading-[1.02]">
-                Thank you! Your order is <em className="text-brown">confirmed.</em>
+                Thank you! Your order is{" "}
+                <em className="text-brown">confirmed.</em>
               </h1>
               <p className="mt-3 max-w-md text-sm text-muted">
-                We&rsquo;ve received your advance payment. Our artist will begin your portrait shortly.
+                We&rsquo;ve received your advance payment. Our artist will begin
+                your portrait shortly.
               </p>
               <div className="mt-8 grid max-w-lg gap-3 sm:grid-cols-2">
                 <Card className="p-4">
@@ -1257,10 +1473,14 @@ function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) =
                 </Card>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button onClick={() => go('track')} className="h-11 px-6">
+                <Button onClick={() => go("track")} className="h-11 px-6">
                   Track your order <Icon name="arrow" />
                 </Button>
-                <Button variant="secondary" onClick={() => go('home')} className="h-11 px-6">
+                <Button
+                  variant="secondary"
+                  onClick={() => go("home")}
+                  className="h-11 px-6"
+                >
                   Back to home
                 </Button>
               </div>
@@ -1271,7 +1491,9 @@ function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) =
               <h1 className="mt-3 font-serif text-5xl leading-[1.02]">
                 Your portrait is <em className="text-brown">in progress.</em>
               </h1>
-              <p className="mt-3 text-sm text-muted">Current status: Drawing in progress</p>
+              <p className="mt-3 text-sm text-muted">
+                Current status: Drawing in progress
+              </p>
               <Card className="mt-8 max-w-lg p-6">
                 <OrderTimeline current={2} />
               </Card>
@@ -1292,11 +1514,17 @@ function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) =
             </div>
             <div className="mt-4 space-y-1.5 border-t border-line pt-3 text-sm">
               <Row l="Total amount" v={formatInr(pricing.totalAmountInr)} />
-              <Row l="Paid (advance)" v={formatInr(pricing.advancePayableInr)} />
-              <Row l="Pay on delivery" v={formatInr(pricing.remainingOnDeliveryInr)} />
+              <Row
+                l="Paid (advance)"
+                v={formatInr(pricing.advancePayableInr)}
+              />
+              <Row
+                l="Pay on delivery"
+                v={formatInr(pricing.remainingOnDeliveryInr)}
+              />
             </div>
           </Card>
-          {mode === 'confirm' && (
+          {mode === "confirm" && (
             <Card className="p-5">
               <p className="mb-4 text-sm font-medium">Order progress</p>
               <OrderTimeline current={1} />
@@ -1311,37 +1539,41 @@ function PostOrder({ mode, go }: { mode: 'confirm' | 'track'; go: (v: RouteId) =
 /* ---------- Design system reference ---------- */
 function System({ go }: { go: (v: RouteId) => void }) {
   const colors = [
-    ['ink', '#1C1915'],
-    ['paper', '#F7F3EC'],
-    ['ivory', '#FBF8F3'],
-    ['sand', '#EFE7DB'],
-    ['brown', '#8B6A4B'],
-    ['brown-hover', '#7A5B3F'],
-    ['brown-pressed', '#664A32'],
-    ['line', '#E6DED2'],
-    ['line-strong', '#D4C8B7'],
-    ['muted', '#7A7168'],
-    ['disabled', '#C9C1B6'],
-    ['success', '#4F7A52'],
-    ['error', '#B4483B'],
+    ["ink", "#1C1915"],
+    ["paper", "#F7F3EC"],
+    ["ivory", "#FBF8F3"],
+    ["sand", "#EFE7DB"],
+    ["brown", "#8B6A4B"],
+    ["brown-hover", "#7A5B3F"],
+    ["brown-pressed", "#664A32"],
+    ["line", "#E6DED2"],
+    ["line-strong", "#D4C8B7"],
+    ["muted", "#7A7168"],
+    ["disabled", "#C9C1B6"],
+    ["success", "#4F7A52"],
+    ["error", "#B4483B"],
   ]
   const type = [
-    ['Display', 'font-serif text-[80px] leading-none', 'Serif 80/0.98'],
-    ['Section heading', 'font-serif text-5xl', 'Serif 48/1.1'],
-    ['Page heading', 'font-serif text-[42px]', 'Serif 42/1.02'],
-    ['Card heading', 'text-[17px] font-medium', 'Inter 17 Medium'],
-    ['Body large', 'text-[15px]', 'Inter 15/1.6'],
-    ['Body', 'text-sm', 'Inter 14/1.5'],
-    ['Small / helper', 'text-xs text-muted', 'Inter 12'],
-    ['Price', 'font-serif text-2xl', 'Serif 24'],
-    ['Eyebrow', 'text-[11px] uppercase tracking-[0.18em] text-brown', 'Inter 11 / 0.18em'],
+    ["Display", "font-serif text-[80px] leading-none", "Serif 80/0.98"],
+    ["Section heading", "font-serif text-5xl", "Serif 48/1.1"],
+    ["Page heading", "font-serif text-[42px]", "Serif 42/1.02"],
+    ["Card heading", "text-[17px] font-medium", "Inter 17 Medium"],
+    ["Body large", "text-[15px]", "Inter 15/1.6"],
+    ["Body", "text-sm", "Inter 14/1.5"],
+    ["Small / helper", "text-xs text-muted", "Inter 12"],
+    ["Price", "font-serif text-2xl", "Serif 24"],
+    [
+      "Eyebrow",
+      "text-[11px] uppercase tracking-[0.18em] text-brown",
+      "Inter 11 / 0.18em",
+    ],
   ]
 
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-line">
         <Container className="flex h-16 items-center justify-between">
-          <Logo onClick={() => go('home')} />
+          <Logo onClick={() => go("home")} />
           <span className="text-sm text-muted">Design system</span>
         </Container>
       </header>
@@ -1351,7 +1583,10 @@ function System({ go }: { go: (v: RouteId) => void }) {
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
             {colors.map(([n, h]) => (
               <div key={n}>
-                <div className="h-16 rounded-lg border border-line" style={{ background: h }} />
+                <div
+                  className="h-16 rounded-lg border border-line"
+                  style={{ background: h }}
+                />
                 <p className="mt-2 text-xs font-medium">{n}</p>
                 <p className="text-[11px] text-muted">{h}</p>
               </div>
@@ -1362,7 +1597,10 @@ function System({ go }: { go: (v: RouteId) => void }) {
           <Eyebrow>Typography</Eyebrow>
           <div className="mt-5 divide-y divide-line">
             {type.map(([n, c, s]) => (
-              <div key={n} className="grid items-baseline gap-2 py-4 md:grid-cols-[180px_1fr]">
+              <div
+                key={n}
+                className="grid items-baseline gap-2 py-4 md:grid-cols-[180px_1fr]"
+              >
                 <p className="text-xs text-muted">
                   {n} · {s}
                 </p>
@@ -1377,14 +1615,16 @@ function System({ go }: { go: (v: RouteId) => void }) {
           <Eyebrow>Radius · spacing · shadow</Eyebrow>
           <div className="mt-5 flex flex-wrap gap-6 text-xs text-muted">
             {[
-              ['sm 4', 'rounded'],
-              ['md 6', 'rounded-md'],
-              ['lg 8', 'rounded-lg'],
-              ['xl 12', 'rounded-xl'],
-              ['full', 'rounded-full'],
+              ["sm 4", "rounded"],
+              ["md 6", "rounded-md"],
+              ["lg 8", "rounded-lg"],
+              ["xl 12", "rounded-xl"],
+              ["full", "rounded-full"],
             ].map(([l, c]) => (
               <div key={l}>
-                <div className={`size-16 border border-line-strong bg-ivory ${c}`} />
+                <div
+                  className={`size-16 border border-line-strong bg-ivory ${c}`}
+                />
                 <p className="mt-2">{l}</p>
               </div>
             ))}
@@ -1393,8 +1633,8 @@ function System({ go }: { go: (v: RouteId) => void }) {
               <p className="mt-2">shadow-card</p>
             </div>
             <p className="self-center">
-              Spacing scale: 4 · 8 · 12 · 16 · 24 · 32 · 40 · 56 · 80 · 112 px. Breakpoints: mobile
-              360–767, tablet 768–1023, desktop ≥1024.
+              Spacing scale: 4 · 8 · 12 · 16 · 24 · 32 · 40 · 56 · 80 · 112 px.
+              Breakpoints: mobile 360–767, tablet 768–1023, desktop ≥1024.
             </p>
           </div>
         </section>
@@ -1436,7 +1676,7 @@ function System({ go }: { go: (v: RouteId) => void }) {
         <section>
           <Eyebrow>Progress states</Eyebrow>
           <div className="mt-5 max-w-2xl space-y-6">
-            {[0, 2, 3].map(n => (
+            {[0, 2, 3].map((n) => (
               <ProgressStepper key={n} step={n} />
             ))}
           </div>
@@ -1455,7 +1695,9 @@ function System({ go }: { go: (v: RouteId) => void }) {
 /* ---------- App Shell & Centralized Router ---------- */
 function AppRouter() {
   const [route, setRoute] = useState<RouteId>(() =>
-    typeof window !== 'undefined' ? resolveRouteFromPath(window.location.pathname) : 'home',
+    typeof window !== "undefined"
+      ? resolveRouteFromPath(window.location.pathname)
+      : "home",
   )
   const { setStep } = useOrder()
 
@@ -1463,8 +1705,8 @@ function AppRouter() {
     const onPopState = () => {
       setRoute(resolveRouteFromPath(window.location.pathname))
     }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
+    window.addEventListener("popstate", onPopState)
+    return () => window.removeEventListener("popstate", onPopState)
   }, [])
 
   useEffect(() => {
@@ -1472,18 +1714,22 @@ function AppRouter() {
   }, [route])
 
   const go = (nextRoute: RouteId) => {
-    if (nextRoute === 'order') setStep(0)
+    if (nextRoute === "order") setStep(0)
     setRoute(nextRoute)
     const targetPath = ROUTES[nextRoute].path
-    if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
-      window.history.pushState({ route: nextRoute }, '', targetPath)
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname !== targetPath
+    ) {
+      window.history.pushState({ route: nextRoute }, "", targetPath)
     }
     window.scrollTo(0, 0)
   }
 
-  if (route === 'order') return <OrderFlow go={go} />
-  if (route === 'confirm' || route === 'track') return <PostOrder mode={route} go={go} />
-  if (route === 'system') return <System go={go} />
+  if (route === "order") return <OrderFlow go={go} />
+  if (route === "confirm" || route === "track")
+    return <PostOrder mode={route} go={go} />
+  if (route === "system") return <System go={go} />
 
   return (
     <>
