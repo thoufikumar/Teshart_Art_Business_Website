@@ -1,19 +1,27 @@
-import { type ImgHTMLAttributes } from 'react'
-import { type ArtworkId, getArtworkAsset } from '../../domain/artworkRegistry'
+import { type ImgHTMLAttributes } from "react"
 
-export interface ArtworkImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt'> {
+import { type ArtworkId, getArtworkAsset } from "../../domain/artworkRegistry"
+
+export interface ArtworkImageProps
+  extends Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> {
   artworkId: ArtworkId
+
   alt?: string
 }
 
 export default function ArtworkImage({
   artworkId,
+
   alt,
-  className = '',
-  loading = 'lazy',
+
+  className = "",
+
+  loading = "lazy",
+
   ...rest
 }: ArtworkImageProps) {
   const asset = getArtworkAsset(artworkId)
+
   return (
     <img
       src={asset.src}
@@ -24,4 +32,3 @@ export default function ArtworkImage({
     />
   )
 }
-

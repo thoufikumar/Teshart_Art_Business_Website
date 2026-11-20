@@ -1,15 +1,16 @@
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react"
 
 export interface EyebrowProps {
   children: ReactNode
   className?: string
 }
 
-export default function Eyebrow({ children, className = '' }: EyebrowProps) {
+export default function Eyebrow({ children, className = "" }: EyebrowProps) {
   return (
-    <p className={`text-[11px] font-medium uppercase tracking-[0.18em] text-brown ${className}`}>
+    <p
+      className={`text-[11px] font-medium uppercase tracking-[0.18em] text-text-secondary ${className}`}
+    >
       {children}
     </p>
   )
 }
-

@@ -2,23 +2,45 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-ink: #1c1915;
-  --color-paper: #f7f3ec;
-  --color-ivory: #fbf8f3;
-  --color-sand: #efe7db;
-  --color-brown: #8b6a4b;
-  --color-brown-hover: #7a5b3f;
-  --color-brown-pressed: #664a32;
-  --color-line: #e6ded2;
-  --color-line-strong: #d4c8b7;
-  --color-muted: #7a7168;
-  --color-disabled: #c9c1b6;
-  --color-success: #4f7a52;
-  --color-error: #b4483b;
+  /* Universal Colour Tokens */
+  --color-bg-primary: #FFFFFF;
+  --color-primary: #242321;
+  --color-primary-hover: #3A3834;
+  --color-primary-active: #1A1918;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F2F0EB;
+  --color-text-primary: #242321;
+  --color-text-secondary: #706D67;
+  --color-border: #E6E2DC;
+  --color-border-strong: #D8D3CB;
+  --color-muted-element: #A69B8C;
+  --color-accent: #D8C9B8;
+
+  /* Backward-compatible & Semantic Theme Aliases */
+  --color-ink: #242321;
+  --color-paper: #FFFFFF;
+  --color-ivory: #FFFFFF;
+  --color-sand: #F2F0EB;
+  --color-line: #E6E2DC;
+  --color-line-strong: #D8D3CB;
+  --color-muted: #706D67;
+  --color-disabled: #D8D3CB;
+  --color-brown: #242321;
+  --color-brown-hover: #3A3834;
+  --color-brown-pressed: #1A1918;
+
+  /* Status Tokens */
+  --color-success: #4F7A52;
+  --color-error: #B4483B;
+
+  /* Typography */
   --font-serif: 'Instrument Serif', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
-  --shadow-card: 0 1px 2px rgb(60 40 20 / 0.04), 0 8px 24px rgb(60 40 20 / 0.06);
+
+  /* Elevation */
+  --shadow-card: 0 1px 3px 0 rgba(36, 35, 33, 0.03), 0 8px 20px 0 rgba(36, 35, 33, 0.04);
 }
+
 :root {
   --header-height: 60px;
 }
@@ -35,6 +57,7 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: #FFFFFF;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -56,8 +79,16 @@ html {
   scroll-margin-top: calc(var(--header-height) + 16px);
 }
 
-body { @apply bg-paper text-ink font-sans antialiased; }
-:focus-visible { outline: 2px solid var(--color-brown); outline-offset: 2px; }
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+  background-color: #FFFFFF;
+  color: #242321;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 
 @keyframes marquee-scroll {
   from {
@@ -80,11 +111,9 @@ body { @apply bg-paper text-ink font-sans antialiased; }
 }
 
 .glass-review-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 3px 5px 10px 5px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
+  border: 1px solid #E6E2DC;
+  box-shadow: 0 1px 3px 0 rgba(36, 35, 33, 0.03), 0 8px 20px 0 rgba(36, 35, 33, 0.04);
 }
 
 @keyframes story-fade-slide {

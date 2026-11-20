@@ -1,4 +1,4 @@
-import Icon, { type IconName } from './Icon'
+import Icon, { type IconName } from "./Icon"
 
 export interface FieldProps {
   icon: IconName
@@ -18,26 +18,26 @@ export default function Field({
   onChange,
   placeholder,
   error,
-  className = '',
-  type = 'text',
+  className = "",
+  type = "text",
 }: FieldProps) {
   return (
     <label className={`block ${className}`}>
       <span
-        className={`flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5 focus-within:border-brown focus-within:ring-1 focus-within:ring-brown ${
-          error ? 'border-error' : 'border-line'
+        className={`flex items-center gap-3 rounded-lg border bg-white px-3 py-2.5 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary ${
+          error ? "border-error" : "border-border"
         }`}
       >
-        <Icon name={icon} className="size-4 shrink-0 text-muted" />
+        <Icon name={icon} className="size-4 shrink-0 text-text-secondary" />
         <span className="min-w-0 flex-1">
-          <span className="block text-xs font-medium">{label}</span>
+          <span className="block text-xs font-medium text-primary">{label}</span>
           <input
             type={type}
             value={value}
-            onChange={e => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             aria-invalid={Boolean(error)}
-            className="w-full bg-transparent text-sm outline-none placeholder:text-muted/70"
+            className="w-full bg-transparent text-sm text-primary outline-none placeholder:text-text-secondary/70"
           />
         </span>
       </span>
@@ -49,4 +49,3 @@ export default function Field({
     </label>
   )
 }
-
