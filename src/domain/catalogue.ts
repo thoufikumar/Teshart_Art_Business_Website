@@ -176,6 +176,36 @@ export const TESTIMONIALS: readonly TestimonialItem[] = [
     customerName: 'Subhashini',
     rating: 5,
   },
+  {
+    id: 'testimonial-anu-dup',
+    quote: '“Such a wonderful gift for my parents’ anniversary. They cried! It captured my father’s expression so well. Worth every rupee.”',
+    customerName: 'Anu',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-ishwarya-dup',
+    quote: '“I gifted this to my boyfriend on his birthday. He loved it! The detailing is amazing and it looks exactly like the photo I sent.”',
+    customerName: 'Ishwarya',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-subhashini-dup',
+    quote: '“The portrait of my family came out so beautiful. Great communication and on-time delivery. Highly recommended!”',
+    customerName: 'Subhashini',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-priya',
+    quote: '“The attention to detail is truly breathtaking. You can feel the emotion in every pencil stroke. Best decision ever!”',
+    customerName: 'Priya R.',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-karthik',
+    quote: '“Ordered a charcoal portrait for our wedding milestone. The framing and packaging were so premium. Truly exceptional artwork.”',
+    customerName: 'Karthik S.',
+    rating: 5,
+  },
 ] as const
 
 export function getPortraitType(id: PortraitTypeId): PortraitTypeDefinition {

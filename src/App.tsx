@@ -67,32 +67,68 @@ const Row = ({ l, v }: { l: string; v: string }) => (
   </div>
 )
 
+const scrollToSection = (id: string) => {
+  const el = document.getElementById(id)
+  if (el) {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    el.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    })
+  }
+}
+
 /* ---------- Homepage ---------- */
 function Header({ go }: { go: (v: RouteId) => void }) {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    targetId: string,
+  ) => {
+    e.preventDefault()
+    scrollToSection(targetId)
+    if (typeof window !== "undefined" && window.location.hash !== `#${targetId}`) {
+      window.history.pushState(null, "", `#${targetId}`)
+    }
+  }
+
   return (
-    <header className="sticky top-0 z-30 box-border w-full border-b border-line/70 bg-ivory/90 px-[20px] backdrop-blur sm:px-[32px] lg:px-[60px]">
-      <div className="grid min-h-[68px] w-full max-w-none grid-cols-[1fr_auto] items-center sm:min-h-[76px] sm:grid-cols-[1fr_auto_1fr] lg:min-h-[88px]">
+    <header className="sticky top-0 z-[1000] isolate box-border w-full border-b border-line/70 bg-ivory/90 backdrop-blur">
+      <div className="mx-auto flex min-h-[60px] w-full max-w-[1300px] items-center justify-between px-5 sm:min-h-[66px] sm:px-8 lg:min-h-[72px] lg:px-12">
         <Logo
           onClick={() => go("home")}
-          className="justify-self-start !text-[18px] font-medium lg:!text-[20px]"
+          className="text-[17px] font-medium lg:text-[19px]"
         />
         <nav
           aria-label="Primary"
-          className="hidden items-center justify-self-center gap-[32px] text-[16px] whitespace-nowrap text-muted sm:flex lg:gap-[44px] lg:text-[16.5px]"
+          className="hidden items-center gap-7 text-[15px] font-medium whitespace-nowrap text-muted sm:flex lg:gap-9"
         >
-          <a href="#how" className="transition-colors hover:text-ink">
+          <a
+            href="#how"
+            onClick={(e) => handleNavClick(e, "how")}
+            className="transition-colors hover:text-ink"
+          >
             Home
           </a>
-          <a href="#why" className="transition-colors hover:text-ink">
+          <a
+            href="#why"
+            onClick={(e) => handleNavClick(e, "why")}
+            className="transition-colors hover:text-ink"
+          >
             Why us
           </a>
-          <a href="#works" className="transition-colors hover:text-ink">
+          <a
+            href="#works"
+            onClick={(e) => handleNavClick(e, "works")}
+            className="transition-colors hover:text-ink"
+          >
             Our works
           </a>
         </nav>
         <Button
           onClick={() => go("order")}
-          className="h-[40px] justify-self-end px-[18px] !text-[15px] sm:h-[44px] sm:px-[20px] lg:h-[48px] lg:px-[24px] lg:!text-[16px]"
+          className="h-9 px-4 text-sm font-medium sm:h-10 sm:px-5 lg:h-10.5 lg:px-6 lg:text-[15px]"
         >
           Order now
         </Button>
@@ -103,17 +139,17 @@ function Header({ go }: { go: (v: RouteId) => void }) {
 
 function Hero({ go }: { go: (v: RouteId) => void }) {
   const scrollToWorks = () => {
-    const el = document.getElementById("works")
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" })
-    }
+    scrollToSection("works")
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-ivory via-sand/45 to-paper">
-      <div className="mx-auto flex w-full max-w-[1680px] flex-col items-center px-5 pt-10 pb-0 sm:px-8 sm:pt-12 lg:px-14 lg:pt-16 xl:px-20">
-        {/* Centered Editorial Headline (+15%) */}
-        <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5875rem,5.29vw,5.75rem)] leading-[1.05] tracking-[-0.015em] text-ink md:max-w-none">
+    <section
+      id="home"
+      className="relative isolate z-10 overflow-hidden bg-gradient-to-b from-ivory via-sand/45 to-paper scroll-mt-0"
+    >
+      <div className="mx-auto flex w-full max-w-[1300px] flex-col items-center px-5 pt-5 pb-0 sm:px-8 sm:pt-7 lg:px-12 lg:pt-8">
+        {/* Centered Editorial Headline: clamp(40px, 4.2vw, 68px) */}
+        <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5rem,4.2vw,4.25rem)] leading-[1.08] tracking-[-0.015em] text-ink md:max-w-none">
           <span className="md:block md:whitespace-nowrap">
             Turning your timeless moments
           </span>{" "}
@@ -123,93 +159,93 @@ function Hero({ go }: { go: (v: RouteId) => void }) {
           </span>
         </h1>
 
-        {/* Primary & Secondary CTAs immediately below the heading (+15%) */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3.5 sm:mt-7 sm:gap-4">
+        {/* Primary & Secondary CTAs */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:mt-5 sm:gap-3.5">
           <Button
             onClick={() => go("order")}
-            className="h-[50.6px] px-[27.6px] !text-[16.1px]"
+            className="h-10.5 px-5.5 text-sm font-medium sm:h-11 sm:px-6 sm:text-[15px]"
           >
-            Create your portrait <Icon name="arrow" className="size-[18.4px]" />
+            Create your portrait <Icon name="arrow" className="size-4" />
           </Button>
           <Button
             variant="secondary"
             onClick={scrollToWorks}
-            className="h-[50.6px] border-line-strong/90 bg-ivory/80 px-[27.6px] !text-[16.1px] hover:bg-sand/70"
+            className="h-10.5 border-line-strong/90 bg-ivory/80 px-5.5 text-sm font-medium hover:bg-sand/70 sm:h-11 sm:px-6 sm:text-[15px]"
           >
             Explore our works
           </Button>
         </div>
 
-        {/* Three-Frame Portrait Gallery Composition (-10%) */}
-        <div className="relative mt-8 flex w-full max-w-[1188px] items-end justify-center sm:mt-10 lg:mt-12">
+        {/* Three-Frame Portrait Gallery Composition (Refined & Proportionally Scaled) */}
+        <div className="relative mt-3.5 flex w-full max-w-[820px] items-end justify-center sm:mt-4 lg:mt-5">
           {/* Ambient soft warm studio glow behind frames */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-[12%] top-[8%] bottom-0 rounded-full bg-brown/10 blur-3xl"
+            className="pointer-events-none absolute inset-x-[12%] top-[6%] bottom-0 rounded-full bg-brown/8 blur-3xl"
           />
 
-          {/* 1. Left: Framed portrait of a woman, rotated slightly counterclockwise */}
-          <div className="relative z-10 w-[28.8%] max-w-[351px] shrink-0 translate-x-[12%] translate-y-[11%] -rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_20px_48px_rgba(28,25,21,0.26)] sm:w-[27%] sm:translate-x-[10%] lg:w-[26.1%]">
+          {/* 1. Left: Framed portrait of a woman */}
+          <div className="relative z-10 w-[26%] max-w-[215px] shrink-0 translate-x-[10%] translate-y-[4%] -rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_14px_32px_rgba(28,25,21,0.20)] sm:w-[25%] lg:w-[24%]">
             <ArtworkImage
               artworkId="framed-woman"
               alt="Framed hand-drawn pencil portrait of a smiling woman"
-              className="block aspect-[3/4] w-full scale-[1.06]"
+              className="block aspect-[3/4] w-full scale-[1.04]"
               loading="eager"
             />
           </div>
 
-          {/* 2. Center: Framed portrait of a child, upright and visually dominant */}
-          <div className="relative z-20 w-[37.8%] max-w-[441px] shrink-0 translate-y-[8.5%] overflow-hidden rounded-[2px] shadow-[0_28px_64px_rgba(28,25,21,0.34)] sm:w-[35.1%] lg:w-[33.3%]">
+          {/* 2. Center: Framed portrait of a child (Prominent Hero Anchor) */}
+          <div className="relative z-20 w-[34%] max-w-[285px] shrink-0 translate-y-[2%] overflow-hidden rounded-[2px] shadow-[0_20px_44px_rgba(28,25,21,0.26)] sm:w-[33%] lg:w-[32%]">
             <ArtworkImage
               artworkId="framed-child"
               alt="Framed hand-drawn pencil portrait of a child"
-              className="block aspect-[3/4] w-full scale-[1.14]"
+              className="block aspect-[3/4] w-full scale-[1.06]"
               loading="eager"
               fetchPriority="high"
             />
           </div>
 
-          {/* 3. Right: Framed family portrait, rotated slightly clockwise */}
-          <div className="relative z-10 w-[28.8%] max-w-[351px] shrink-0 -translate-x-[12%] translate-y-[11%] rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_20px_48px_rgba(28,25,21,0.26)] sm:w-[27%] sm:-translate-x-[10%] lg:w-[26.1%]">
+          {/* 3. Right: Framed family portrait */}
+          <div className="relative z-10 w-[26%] max-w-[215px] shrink-0 -translate-x-[10%] translate-y-[4%] rotate-[6deg] overflow-hidden rounded-[2px] shadow-[0_14px_32px_rgba(28,25,21,0.20)] sm:w-[25%] lg:w-[24%]">
             <ArtworkImage
               artworkId="framed-family"
               alt="Framed hand-drawn family pencil portrait"
-              className="block aspect-[3/4] w-full scale-[1.07]"
+              className="block aspect-[3/4] w-full scale-[1.04]"
               loading="eager"
             />
           </div>
         </div>
 
-        {/* Progressive bottom blur overlay confined to the hero artwork bottom region */}
+        {/* Progressive bottom blur overlay (increased spread by 15%) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[28%] sm:h-[30%]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[25.3%] sm:h-[27.6%]"
         >
           <div
-            className="absolute inset-0 backdrop-blur-[3px]"
+            className="absolute inset-0 backdrop-blur-[2.3px]"
             style={{
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 45%, black 100%)",
               maskImage:
-                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.45) 45%, black 100%)",
+                "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 45%, black 100%)",
             }}
           />
           <div
-            className="absolute inset-0 backdrop-blur-[7px]"
+            className="absolute inset-0 backdrop-blur-[5.75px]"
             style={{
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)",
+                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.5) 65%, black 100%)",
               maskImage:
-                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.55) 65%, black 100%)",
+                "linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.5) 65%, black 100%)",
             }}
           />
           <div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-paper/55 to-paper backdrop-blur-[12px]"
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-paper/50 to-paper backdrop-blur-[9.2px]"
             style={{
               WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)",
+                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 75%, black 100%)",
               maskImage:
-                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 75%, black 100%)",
+                "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 75%, black 100%)",
             }}
           />
         </div>
@@ -240,23 +276,23 @@ function How() {
   return (
     <section
       id="how"
-      className="box-border w-full bg-paper py-20 sm:py-28 lg:py-32 px-5 sm:px-8 lg:px-[62px]"
+      className="box-border w-full bg-paper py-16 sm:py-18 lg:py-20 scroll-mt-[76px] sm:scroll-mt-[82px] lg:scroll-mt-[88px]"
     >
-      <div className="w-full text-center">
-        <Eyebrow className="!text-[13.8px] sm:!text-[16.1px] tracking-[0.2em]">
+      <div className="mx-auto w-full max-w-[1300px] px-5 sm:px-8 lg:px-12 text-center">
+        <Eyebrow className="text-xs sm:text-[13px] tracking-[0.2em]">
           How it works
         </Eyebrow>
-        <h2 className="mt-4 font-serif text-[41.4px] sm:text-[55.2px] md:text-[69px] lg:text-[73.6px] leading-[1.1] tracking-tight">
+        <h2 className="mt-3.5 sm:mt-4 font-serif text-3xl sm:text-4xl lg:text-[44px] xl:text-[46px] leading-[1.12] tracking-tight text-ink">
           Your photo, to their heart.
         </h2>
-        <div className="mt-14 sm:mt-16 lg:mt-20 grid gap-10 sm:grid-cols-3 lg:gap-14 xl:gap-16">
+        <div className="mt-12 sm:mt-14 lg:mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 xl:gap-12">
           {steps.map((step, i) => (
             <div key={step.title} className="flex flex-col items-center">
               <div className="relative">
-                <span className="absolute left-1/2 -top-2.5 z-10 grid size-[41.4px] sm:size-[46px] -translate-x-1/2 place-items-center rounded-full bg-brown text-[16.1px] sm:text-[18.4px] font-semibold text-white shadow-md ring-4 ring-paper">
+                <span className="absolute left-1/2 -top-2.5 z-10 grid size-8 sm:size-8.5 -translate-x-1/2 place-items-center rounded-full bg-brown text-sm sm:text-base font-semibold text-white shadow-md ring-4 ring-paper">
                   {i + 1}
                 </span>
-                <div className="size-48 sm:size-56 md:size-60 lg:size-64 xl:size-72 transition-transform duration-300 hover:scale-[1.02]">
+                <div className="size-40 sm:size-44 lg:size-48 transition-transform duration-300 hover:scale-[1.02]">
                   <img
                     src={step.img}
                     alt={step.title}
@@ -265,10 +301,10 @@ function How() {
                   />
                 </div>
               </div>
-              <h3 className="mt-6 sm:mt-7 font-serif text-[27.6px] sm:text-[34.5px] lg:text-[36.8px] font-medium tracking-tight text-ink">
+              <h3 className="mt-5 font-serif text-xl sm:text-[22px] lg:text-[23px] font-medium tracking-tight text-ink">
                 {step.title}
               </h3>
-              <p className="mt-3 max-w-[322px] sm:max-w-[391px] text-[18.4px] sm:text-[20.7px] leading-relaxed text-muted">
+              <p className="mt-2 max-w-[280px] sm:max-w-[320px] text-sm sm:text-[15px] leading-relaxed text-muted">
                 {step.desc}
               </p>
             </div>
@@ -279,59 +315,98 @@ function How() {
   )
 }
 
+interface WorkStorySlide {
+  id: string
+  artworkId: ArtworkId
+  category: string
+  headingLead: string
+  headingAccent: string
+  description: string
+}
+
+const WORK_SLIDES: WorkStorySlide[] = [
+  {
+    id: "couple",
+    artworkId: "framed-couple",
+    category: "COUPLE PORTRAIT",
+    headingLead: "A little piece of your",
+    headingAccent: "forever.",
+    description:
+      "Two people, countless memories, and a moment worth keeping close. Turn your favourite photograph together into something timeless.",
+  },
+  {
+    id: "child",
+    artworkId: "framed-girl-crown",
+    category: "CHILD PORTRAIT",
+    headingLead: "Little moments, big",
+    headingAccent: "memories.",
+    description:
+      "Childhood passes in the blink of an eye. Preserve those innocent smiles and precious little expressions in a portrait made to last.",
+  },
+  {
+    id: "family",
+    artworkId: "framed-family",
+    category: "FAMILY PORTRAIT",
+    headingLead: "The people who make a place feel like",
+    headingAccent: "home.",
+    description:
+      "From everyday smiles to once-in-a-lifetime gatherings, bring your favourite family moments together in one beautiful frame.",
+  },
+]
+
 function Works({ go }: { go: (v: RouteId) => void }) {
-  const slides: ArtworkId[] = [
-    "framed-couple",
-    "framed-girl-crown",
-    "framed-family",
-  ]
-  const [i, setI] = useState(0)
+  const [activeSlide, setActiveSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
   // Active carousel autoplay (pauses on user hover/touch)
   useEffect(() => {
     if (isPaused) return
     const timer = setInterval(() => {
-      setI((prev) => (prev + 1) % slides.length)
-    }, 4500)
+      setActiveSlide((prev) => (prev + 1) % WORK_SLIDES.length)
+    }, 5000)
     return () => clearInterval(timer)
-  }, [isPaused, slides.length])
+  }, [isPaused])
+
+  const currentSlide = WORK_SLIDES[activeSlide]
 
   return (
     <section
       id="works"
-      className="relative flex flex-col justify-center bg-ivory py-14 sm:py-18 lg:py-0 lg:min-h-[calc(100svh-var(--header-height))]"
+      className="relative flex flex-col justify-center bg-ivory py-14 sm:py-16 lg:py-20 scroll-mt-[76px] sm:scroll-mt-[82px] lg:scroll-mt-[88px]"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
     >
-      <div className="mx-auto box-border flex w-full max-w-[1400px] flex-1 flex-col justify-center px-5 sm:px-8 lg:px-12 xl:px-16">
-        <div className="grid items-center gap-10 md:gap-12 lg:grid-cols-[38%_62%] xl:gap-16">
+      <div className="mx-auto box-border flex w-full max-w-[1300px] flex-1 flex-col justify-center px-5 sm:px-8 lg:px-12">
+        <div className="grid items-center gap-10 md:gap-12 lg:grid-cols-[38%_62%] xl:gap-14">
           {/* Left Editorial Content (35-40% width) */}
           <div className="flex flex-col items-start">
-            <Eyebrow className="!text-[12px] sm:!text-[13px] tracking-[0.2em]">Our works</Eyebrow>
-            <h2 className="mt-3.5 sm:mt-4 font-serif text-[clamp(2.5rem,4.4vw,4.5rem)] leading-[1.04] tracking-[-0.015em] text-ink">
-              Made from moments{" "}
-              <em className="font-serif italic text-brown">that matter.</em>
-            </h2>
-            <p className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-[19px] leading-relaxed text-muted max-w-[34ch]">
-              Real people. Real stories.
-              <br />
-              Hand-drawn with care.
-            </p>
+            <div
+              key={activeSlide}
+              className="animate-story-fade flex flex-col items-start min-h-[210px] sm:min-h-[225px] lg:min-h-[240px]"
+            >
+              <Eyebrow className="text-xs sm:text-[13px] tracking-[0.2em]">
+                {currentSlide.category}
+              </Eyebrow>
+              <h2 className="mt-3.5 sm:mt-4 font-serif text-3xl sm:text-4xl lg:text-[44px] leading-[1.1] tracking-[-0.015em] text-ink">
+                {currentSlide.headingLead}{" "}
+                <em className="font-serif italic text-brown">{currentSlide.headingAccent}</em>
+              </h2>
+              <p className="mt-4 sm:mt-5 text-[15px] sm:text-base leading-relaxed text-muted max-w-[36ch]">
+                {currentSlide.description}
+              </p>
+            </div>
             <Button
               onClick={() => go("order")}
-              className="mt-8 sm:mt-9 h-[50px] sm:h-[54px] px-7 sm:px-8 !text-[16px] sm:!text-[17px] font-medium shadow-sm hover:shadow transition-all"
+              className="mt-7 sm:mt-8 h-11 sm:h-11.5 px-6 sm:px-7 text-[15px] font-medium shadow-sm hover:shadow transition-all"
             >
-              Explore our works <Icon name="arrow" className="size-5" />
+              Explore our works <Icon name="arrow" className="size-4.5" />
             </Button>
           </div>
 
           {/* Right Artwork Carousel (60-65% width) */}
-          <div
-            className="relative flex flex-col items-center justify-center w-full"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-            onTouchStart={() => setIsPaused(true)}
-            onTouchEnd={() => setIsPaused(false)}
-          >
+          <div className="relative flex flex-col items-center justify-center w-full">
             {/* Subtle warm ambient backdrop glow behind the showcase */}
             <div
               aria-hidden="true"
@@ -339,43 +414,51 @@ function Works({ go }: { go: (v: RouteId) => void }) {
             />
 
             {/* Active Carousel Stage with adaptive sizing & smooth transition */}
-            <div className="relative flex w-full items-center justify-center overflow-hidden py-4 sm:py-6 min-h-[380px] sm:min-h-[460px] md:min-h-[520px] lg:min-h-[560px] xl:min-h-[600px]">
+            <div className="relative flex w-full items-center justify-center overflow-hidden py-3 sm:py-4 min-h-[320px] sm:min-h-[380px] md:min-h-[420px] lg:min-h-[460px]">
               {/* Previous Arrow Button — positioned in the carousel */}
               <button
                 type="button"
                 aria-label="Previous artwork"
-                onClick={() => setI((i + slides.length - 1) % slides.length)}
-                className="absolute left-2 sm:left-4 z-30 grid size-11 sm:size-12 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
+                onClick={() =>
+                  setActiveSlide(
+                    (activeSlide + WORK_SLIDES.length - 1) % WORK_SLIDES.length
+                  )
+                }
+                className="absolute left-2 sm:left-4 z-30 grid size-10 sm:size-11 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
               >
-                <Icon name="back" className="size-5" />
+                <Icon name="back" className="size-4.5" />
               </button>
 
               {/* All slides rendered with smooth transition and self-adapting dimensions */}
-              <div className="relative flex w-full items-center justify-center h-full min-h-[360px] sm:min-h-[430px] md:min-h-[490px] lg:min-h-[540px] xl:min-h-[580px]">
-                {slides.map((slide, idx) => {
-                  const isActive = idx === i
-                  const diff = (idx - i + slides.length) % slides.length
+              <div className="relative flex w-full items-center justify-center h-full min-h-[300px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px]">
+                {WORK_SLIDES.map((slide, idx) => {
+                  const isActive = idx === activeSlide
+                  const diff =
+                    (idx - activeSlide + WORK_SLIDES.length) % WORK_SLIDES.length
                   const isNext = diff === 1
-                  const isPrev = diff === slides.length - 1
+                  const isPrev = diff === WORK_SLIDES.length - 1
 
                   let transformClass = "scale-95 opacity-0 pointer-events-none z-10"
                   if (isActive) {
-                    transformClass = "scale-100 opacity-100 translate-x-0 z-20 pointer-events-auto"
+                    transformClass =
+                      "scale-100 opacity-100 translate-x-0 z-20 pointer-events-auto"
                   } else if (isNext) {
-                    transformClass = "scale-95 opacity-0 translate-x-10 sm:translate-x-14 pointer-events-none z-10"
+                    transformClass =
+                      "scale-95 opacity-0 translate-x-10 sm:translate-x-14 pointer-events-none z-10"
                   } else if (isPrev) {
-                    transformClass = "scale-95 opacity-0 -translate-x-10 sm:-translate-x-14 pointer-events-none z-10"
+                    transformClass =
+                      "scale-95 opacity-0 -translate-x-10 sm:-translate-x-14 pointer-events-none z-10"
                   }
 
                   return (
                     <div
-                      key={slide}
+                      key={slide.id}
                       className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out ${transformClass}`}
                     >
                       <ArtworkImage
-                        artworkId={slide}
-                        alt="Featured hand-drawn portrait"
-                        className="max-h-[360px] sm:max-h-[430px] md:max-h-[490px] lg:max-h-[540px] xl:max-h-[580px] w-auto max-w-[85%] md:max-w-[82%] object-contain rounded-[3px] shadow-[0_24px_54px_rgba(28,25,21,0.22)] ring-1 ring-black/5 transition-transform duration-500 hover:scale-[1.01]"
+                        artworkId={slide.artworkId}
+                        alt={`${slide.category} — featured hand-drawn portrait`}
+                        className="max-h-[300px] sm:max-h-[360px] md:max-h-[400px] lg:max-h-[450px] w-auto max-w-[85%] md:max-w-[80%] object-contain rounded-[3px] shadow-[0_20px_44px_rgba(28,25,21,0.2)] ring-1 ring-black/5 transition-transform duration-500 hover:scale-[1.01]"
                         loading={idx === 0 ? "eager" : "lazy"}
                       />
                     </div>
@@ -387,23 +470,25 @@ function Works({ go }: { go: (v: RouteId) => void }) {
               <button
                 type="button"
                 aria-label="Next artwork"
-                onClick={() => setI((i + 1) % slides.length)}
-                className="absolute right-2 sm:right-4 z-30 grid size-11 sm:size-12 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
+                onClick={() =>
+                  setActiveSlide((activeSlide + 1) % WORK_SLIDES.length)
+                }
+                className="absolute right-2 sm:right-4 z-30 grid size-10 sm:size-11 place-items-center rounded-full border border-line-strong/80 bg-white/85 text-muted shadow-md backdrop-blur transition-all hover:border-line-strong hover:bg-white hover:text-ink hover:scale-105 active:scale-95"
               >
-                <Icon name="arrow" className="size-5" />
+                <Icon name="arrow" className="size-4.5" />
               </button>
             </div>
 
             {/* Pagination indicators */}
-            <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2">
-              {slides.map((_, j) => (
+            <div className="mt-3.5 sm:mt-4 flex items-center justify-center gap-2">
+              {WORK_SLIDES.map((slide, j) => (
                 <button
-                  key={j}
+                  key={slide.id}
                   type="button"
-                  aria-label={`Go to artwork slide ${j + 1}`}
-                  onClick={() => setI(j)}
+                  aria-label={`Go to ${slide.category} slide (${j + 1} of ${WORK_SLIDES.length})`}
+                  onClick={() => setActiveSlide(j)}
                   className={`h-2 rounded-full transition-all duration-500 ${
-                    j === i
+                    j === activeSlide
                       ? "w-7 bg-brown"
                       : "w-2 bg-line-strong hover:bg-muted"
                   }`}
@@ -419,29 +504,69 @@ function Works({ go }: { go: (v: RouteId) => void }) {
 
 function Testimonials() {
   return (
-    <section id="why" className="bg-sand/60 py-20 md:py-24">
+    <section
+      id="why"
+      aria-label="Their words mean everything"
+      className="relative overflow-hidden py-14 sm:py-16 lg:py-18 scroll-mt-[76px] sm:scroll-mt-[82px] lg:scroll-mt-[88px]"
+    >
       <Container className="text-center">
-        <Eyebrow>What our customers say</Eyebrow>
-        <h2 className="mt-3 font-serif text-4xl md:text-5xl">
+        <Eyebrow className="text-xs sm:text-[13px] tracking-[0.2em]">What our customers say</Eyebrow>
+        <h2 className="mt-3.5 font-serif text-3xl sm:text-4xl lg:text-[42px] leading-[1.12] text-ink">
           Their words mean everything.
         </h2>
-        <div className="mt-12 grid gap-5 text-left md:grid-cols-3">
-          {TESTIMONIALS.map((item) => (
-            <figure
-              key={item.id}
-              className="rounded-lg border border-line bg-ivory p-6 shadow-card"
-            >
-              <Stars count={item.rating} />
-              <blockquote className="mt-4 text-sm leading-relaxed">
-                {item.quote}
-              </blockquote>
-              <figcaption className="mt-5 text-xs font-medium">
-                {item.customerName}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
       </Container>
+
+      <div className="relative mt-8 sm:mt-10 w-full overflow-hidden py-4">
+        {/* Soft edge gradient fades so cards emerge and dissolve smoothly */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-24 md:w-32 bg-gradient-to-r from-paper to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-24 md:w-32 bg-gradient-to-l from-paper to-transparent" />
+
+        <div className="animate-marquee-slow flex w-max">
+          <div className="flex shrink-0 gap-6 pr-6">
+            {TESTIMONIALS.map((item, idx) => (
+              <figure
+                key={`review-a-${item.id}-${idx}`}
+                className="glass-review-card relative flex w-[290px] sm:w-[330px] shrink-0 flex-col justify-between rounded-2xl p-5 sm:p-6 text-left transition-all duration-300 hover:bg-white/75"
+                style={{
+                  boxShadow: "3px 5px 10px 5px rgba(0, 0, 0, 0.05)",
+                }}
+              >
+                <div>
+                  <Stars count={item.rating} />
+                  <blockquote className="mt-3.5 text-sm leading-relaxed text-ink/90">
+                    {item.quote}
+                  </blockquote>
+                </div>
+                <figcaption className="mt-4 text-xs font-semibold tracking-wide text-ink/80">
+                  {item.customerName}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <div className="flex shrink-0 gap-6 pr-6" aria-hidden="true">
+            {TESTIMONIALS.map((item, idx) => (
+              <figure
+                key={`review-b-${item.id}-${idx}`}
+                className="glass-review-card relative flex w-[290px] sm:w-[330px] shrink-0 flex-col justify-between rounded-2xl p-5 sm:p-6 text-left transition-all duration-300 hover:bg-white/75"
+                style={{
+                  boxShadow: "3px 5px 10px 5px rgba(0, 0, 0, 0.05)",
+                }}
+              >
+                <div>
+                  <Stars count={item.rating} />
+                  <blockquote className="mt-3.5 text-sm leading-relaxed text-ink/90">
+                    {item.quote}
+                  </blockquote>
+                </div>
+                <figcaption className="mt-4 text-xs font-semibold tracking-wide text-ink/80">
+                  {item.customerName}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
@@ -452,128 +577,216 @@ function CreateSection({ go }: { go: (v: RouteId) => void }) {
     draft.configuration.portraitType,
   )
   const field =
-    "h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink"
+    "h-11 sm:h-12 w-full rounded-lg border border-line-strong/80 bg-white px-3.5 text-sm sm:text-[15px] text-ink transition-colors focus:border-brown focus:outline-none focus:ring-1 focus:ring-brown"
 
   return (
-    <section className="bg-paper py-20 md:py-28">
-      <Container className="grid items-center gap-12 md:grid-cols-2">
-        <div>
-          <Eyebrow>Create yours</Eyebrow>
-          <h2 className="mt-3 font-serif text-5xl leading-[1] md:text-6xl">
-            A gift they&rsquo;ll <em className="text-brown">always cherish.</em>
-          </h2>
-          <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted">
-            Upload your photo, choose your details and we&rsquo;ll take care of
-            the rest.
-          </p>
-          <div className="mt-10 grid max-w-md grid-cols-3 gap-6 text-xs text-muted">
-            {([
-              ["pen", "Hand-drawn with care"],
-              ["truck", "Safe delivery across India"],
-              ["heart", "A meaningful gift, always"],
-            ] as const).map(([ic, l]) => (
-              <div key={l}>
-                <Icon name={ic} className="size-5 text-brown" />
-                <p className="mt-2 leading-snug">{l}</p>
+    <section
+      id="create"
+      className="bg-white py-14 sm:py-16 lg:py-18 scroll-mt-[76px] sm:scroll-mt-[82px] lg:scroll-mt-[88px]"
+    >
+      <div className="mx-auto w-full max-w-[1300px] px-5 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12 xl:gap-14">
+          <div className="flex flex-col justify-center">
+            <Eyebrow className="text-xs sm:text-[13px] tracking-[0.2em]">CREATE YOURS</Eyebrow>
+            <h2 className="mt-3.5 font-serif text-3xl sm:text-4xl lg:text-[44px] leading-[1.1] tracking-tight text-ink">
+              A portrait they&rsquo;ll{" "}
+              <em className="font-serif italic text-brown">always cherish.</em>
+            </h2>
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted sm:mt-5 sm:text-base">
+              Upload your photo, choose your portrait style and size, and share
+              your delivery details. We&rsquo;ll take care of turning your
+              favourite memory into a hand-drawn keepsake.
+            </p>
+            <div className="mt-7 grid grid-cols-1 gap-4 border-t border-line/70 pt-5 sm:mt-8 sm:grid-cols-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
+                <div className="flex size-8.5 shrink-0 items-center justify-center rounded-lg bg-sand/40 text-brown">
+                  <Icon name="pen" className="size-4" />
+                </div>
+                <p className="text-xs font-medium leading-snug text-ink/85 sm:text-[13px]">
+                  Hand-drawn with care
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-line bg-ivory p-5 shadow-card md:p-6">
-          <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
-            <button
-              type="button"
-              onClick={() => go("order")}
-              className="flex aspect-square flex-col items-center justify-center rounded-md border border-dashed border-line-strong bg-white text-center text-muted hover:bg-sand/40"
-            >
-              <Icon name="img" className="size-6" />
-              <span className="mt-2 text-xs text-ink">Upload your photo</span>
-              <span className="text-[11px]">JPG, PNG (max 10MB)</span>
-            </button>
-            <div className="space-y-2.5">
-              <select
-                aria-label="Select portrait type"
-                value={draft.configuration.portraitType}
-                onChange={(e) =>
-                  selectPortraitType(e.target.value as PortraitTypeId)
-                }
-                className={field}
-              >
-                {PORTRAIT_TYPES.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.title}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label="Select size"
-                value={draft.configuration.size}
-                onChange={(e) => selectSize(e.target.value as PortraitSizeId)}
-                className={field}
-              >
-                {availableSizes.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.id} ({s.dimensionsCm})
-                  </option>
-                ))}
-              </select>
-              <input className={field} placeholder="Your mobile number" />
-              <input className={field} placeholder="Delivery address" />
+              <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
+                <div className="flex size-8.5 shrink-0 items-center justify-center rounded-lg bg-sand/40 text-brown">
+                  <Icon name="heart" className="size-4" />
+                </div>
+                <p className="text-xs font-medium leading-snug text-ink/85 sm:text-[13px]">
+                  Personalised to your choice
+                </p>
+              </div>
+              <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
+                <div className="flex size-8.5 shrink-0 items-center justify-center rounded-lg bg-sand/40 text-brown">
+                  <Icon name="truck" className="size-4" />
+                </div>
+                <p className="text-xs font-medium leading-snug text-ink/85 sm:text-[13px]">
+                  Delivered safely across India
+                </p>
+              </div>
             </div>
           </div>
-          <div className="mt-5 space-y-1.5 border-t border-line pt-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted">Estimated price</span>
-              <span className="font-medium">
-                {formatInr(pricing.totalAmountInr)}
+
+          <div
+            className="w-full rounded-[11px] border border-line/80 bg-ivory/80 p-6 sm:p-7 md:p-8 transition-all"
+            style={{
+              borderRadius: "11px",
+              boxShadow:
+                "0 16px 38px 0 rgba(28, 25, 21, 0.045), 0 4px 12px 0 rgba(28, 25, 21, 0.02)",
+            }}
+          >
+            <div className="grid gap-4.5 sm:grid-cols-[210px_1fr] lg:grid-cols-[225px_1fr]">
+              <button
+                type="button"
+                onClick={() => go("order")}
+                className="group flex aspect-[4/3] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-line-strong/80 bg-white p-4.5 text-center transition-all hover:border-brown hover:bg-sand/20 sm:aspect-square"
+              >
+                <div className="flex size-11 items-center justify-center rounded-full bg-sand/45 text-brown transition-transform group-hover:scale-105">
+                  <Icon name="img" className="size-5.5" />
+                </div>
+                <span className="mt-2.5 text-sm font-medium text-ink">
+                  Upload your photo
+                </span>
+                <span className="mt-0.5 text-xs text-muted">
+                  JPG, PNG (max 10MB)
+                </span>
+                <span className="mt-2.5 inline-flex items-center gap-1 rounded-full border border-line bg-sand/30 px-3 py-1 text-xs font-medium text-ink/80 transition-colors group-hover:bg-sand/70">
+                  Browse file
+                </span>
+              </button>
+
+              <div className="space-y-3">
+                <select
+                  aria-label="Select portrait type"
+                  value={draft.configuration.portraitType}
+                  onChange={(e) =>
+                    selectPortraitType(e.target.value as PortraitTypeId)
+                  }
+                  className={field}
+                >
+                  {PORTRAIT_TYPES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  aria-label="Select size"
+                  value={draft.configuration.size}
+                  onChange={(e) => selectSize(e.target.value as PortraitSizeId)}
+                  className={field}
+                >
+                  {availableSizes.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.id} ({s.dimensionsCm})
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  className={field}
+                  placeholder="Your mobile number"
+                  aria-label="Your mobile number"
+                />
+                <input
+                  type="text"
+                  className={field}
+                  placeholder="Delivery address"
+                  aria-label="Delivery address"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-2 border-t border-line/80 pt-4 text-sm sm:text-[15px]">
+              <div className="flex items-baseline justify-between">
+                <span className="text-muted">Estimated price</span>
+                <span className="font-serif text-2xl font-semibold text-ink sm:text-[26px]">
+                  {formatInr(pricing.totalAmountInr)}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-muted sm:text-sm">
+                <span>Pay now (advance)</span>
+                <span className="font-medium text-ink">
+                  {formatInr(pricing.advancePayableInr)}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-muted sm:text-sm">
+                <span>Pay on delivery</span>
+                <span className="font-medium text-ink">
+                  {formatInr(pricing.remainingOnDeliveryInr)}
+                </span>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => go("order")}
+              className="mt-5 h-12 w-full text-[15px] font-medium tracking-wide shadow-sm transition-all hover:shadow sm:mt-6 sm:text-base"
+            >
+              Create my portrait <Icon name="arrow" className="size-4" />
+            </Button>
+
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-muted sm:gap-7">
+              <span className="flex items-center gap-1.5 font-medium">
+                <Icon name="lock" className="size-3.5 text-brown" />
+                Secure payment
+              </span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <Icon name="truck" className="size-3.5 text-brown" />
+                7–10 days delivery
               </span>
             </div>
-            <div className="flex justify-between text-xs text-muted">
-              <span>Pay now (advance)</span>
-              <span>{formatInr(pricing.advancePayableInr)}</span>
-            </div>
-            <div className="flex justify-between text-xs text-muted">
-              <span>Pay on delivery</span>
-              <span>{formatInr(pricing.remainingOnDeliveryInr)}</span>
-            </div>
-          </div>
-          <Button onClick={() => go("order")} className="mt-5 h-11 w-full">
-            Create my portrait <Icon name="arrow" />
-          </Button>
-          <div className="mt-4 flex justify-center gap-6 text-[11px] text-muted">
-            <span className="flex items-center gap-1">
-              <Icon name="lock" className="size-3" />
-              Secure payment
-            </span>
-            <span className="flex items-center gap-1">
-              <Icon name="truck" className="size-3" />
-              7–10 days delivery
-            </span>
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   )
 }
 
 function Footer({ go }: { go: (v: RouteId) => void }) {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    targetId: string,
+  ) => {
+    e.preventDefault()
+    scrollToSection(targetId)
+    if (typeof window !== "undefined" && window.location.hash !== `#${targetId}`) {
+      window.history.pushState(null, "", `#${targetId}`)
+    }
+  }
+
   return (
     <footer className="border-t border-line bg-paper">
-      <Container className="flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
+      <Container className="flex flex-col gap-5 py-8 md:flex-row md:items-center md:justify-between sm:py-9">
         <div>
-          <Logo onClick={() => go("home")} />
-          <p className="mt-2 text-xs text-muted">
+          <Logo onClick={() => go("home")} className="text-[17px]" />
+          <p className="mt-1.5 text-xs text-muted">
             Hand-drawn portraits for your special moments.
           </p>
         </div>
-        <nav className="flex gap-6 text-sm text-muted">
-          <a href="#how">Home</a>
-          <a href="#why">Why us</a>
-          <a href="#works">Our works</a>
+        <nav className="flex gap-6 text-xs sm:text-sm text-muted">
+          <a
+            href="#how"
+            onClick={(e) => handleNavClick(e, "how")}
+            className="hover:text-ink transition-colors"
+          >
+            Home
+          </a>
+          <a
+            href="#why"
+            onClick={(e) => handleNavClick(e, "why")}
+            className="hover:text-ink transition-colors"
+          >
+            Why us
+          </a>
+          <a
+            href="#works"
+            onClick={(e) => handleNavClick(e, "works")}
+            className="hover:text-ink transition-colors"
+          >
+            Our works
+          </a>
           <button
             type="button"
             onClick={() => go("system")}
-            className="hover:text-ink"
+            className="hover:text-ink transition-colors"
           >
             Design system
           </button>
@@ -1715,6 +1928,19 @@ function AppRouter() {
 
   const go = (nextRoute: RouteId) => {
     if (nextRoute === "order") setStep(0)
+    if (route === "home" && nextRoute === "home") {
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      })
+      if (typeof window !== "undefined" && window.location.hash) {
+        window.history.pushState(null, "", window.location.pathname)
+      }
+      return
+    }
     setRoute(nextRoute)
     const targetPath = ROUTES[nextRoute].path
     if (
