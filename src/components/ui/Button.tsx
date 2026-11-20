@@ -2,7 +2,7 @@ import { type ButtonHTMLAttributes, type ReactNode } from "react"
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
-  variant?: "primary" | "secondary" | "text"
+  variant?: "primary" | "secondary" | "text" | "nav-glass" | "hero-cta"
 }
 
 export default function Button({
@@ -27,6 +27,10 @@ export default function Button({
   } else if (variant === "text") {
     variantClasses =
       "bg-transparent text-primary hover:text-primary-hover hover:underline disabled:text-muted-element p-0"
+  } else if (variant === "nav-glass") {
+    variantClasses = "btn-nav-glass"
+  } else if (variant === "hero-cta") {
+    variantClasses = "btn-hero-cta"
   }
 
   return (

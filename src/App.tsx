@@ -160,6 +160,7 @@ function Header({ go }: { go: (v: RouteId) => void }) {
           </a>
         </nav>
         <Button
+          variant="nav-glass"
           onClick={() => go("order")}
           className="h-9 px-4 text-sm font-medium sm:h-10 sm:px-5 lg:h-10.5 lg:px-6 lg:text-[15px]"
         >
@@ -180,37 +181,56 @@ function Hero({ go }: { go: (v: RouteId) => void }) {
       id="home"
       className="relative isolate z-10 overflow-hidden bg-bg-primary scroll-mt-0"
     >
-      <div className="mx-auto flex w-full max-w-[1300px] flex-col items-center px-5 pt-5 pb-0 sm:px-8 sm:pt-7 lg:px-12 lg:pt-8">
-        {/* Centered Editorial Headline: clamp(40px, 4.2vw, 68px) */}
-        <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5rem,4.2vw,4.25rem)] leading-[1.08] tracking-[-0.015em] text-primary md:max-w-none">
-          <span className="md:block md:whitespace-nowrap">
-            Turning your timeless moments
-          </span>{" "}
-          <span className="md:block md:whitespace-nowrap">
-            into beautiful{" "}
-            <em className="font-serif italic text-primary">keepsake.</em>
-          </span>
-        </h1>
+      <div className="mx-auto flex w-full max-w-[1300px] flex-col items-center px-5 pt-4 pb-0 sm:px-8 sm:pt-6 lg:px-12 lg:pt-[clamp(1.25rem,2.5vh,2rem)]">
+        {/* Top Header & Interaction Group */}
+        <div className="flex flex-col items-center text-center">
+          {/* 1. Centered Editorial Headline: clamp(40px, 4.2vw, 68px) */}
+          <h1 className="mx-auto max-w-[18ch] text-center font-serif text-[clamp(2.5rem,4.2vw,4.25rem)] leading-[1.08] tracking-[-0.015em] text-primary md:max-w-none">
+            <span className="md:block md:whitespace-nowrap">
+              Turning your timeless moments
+            </span>{" "}
+            <span className="md:block md:whitespace-nowrap">
+              into beautiful{" "}
+              <em className="font-serif italic text-primary">
+                <span className="champagne-shimmer">keepsake</span>.
+              </em>
+            </span>
+          </h1>
 
-        {/* Primary & Secondary CTAs */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:mt-5 sm:gap-3.5">
-          <Button
-            onClick={() => go("order")}
-            className="h-10.5 px-5.5 text-sm font-medium sm:h-11 sm:px-6 sm:text-[15px]"
-          >
-            Create your portrait <Icon name="arrow" className="size-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={scrollToWorks}
-            className="h-10.5 px-5.5 text-sm font-medium sm:h-11 sm:px-6 sm:text-[15px]"
-          >
-            Explore our works
-          </Button>
+          {/* 2. Brand tags: comfortable breathing room from headline */}
+          <div className="mt-[clamp(0.95rem,1.8vh,1.35rem)] flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-[11px] sm:text-xs font-medium tracking-[0.18em] uppercase text-[#9B793E]">
+            <span>Cherished</span>
+            <span className="text-[#C6A66B]/50 select-none text-[10px]" aria-hidden="true">
+              ·
+            </span>
+            <span>Beloved</span>
+            <span className="text-[#C6A66B]/50 select-none text-[10px]" aria-hidden="true">
+              ·
+            </span>
+            <span>Eternal</span>
+          </div>
+
+          {/* 3. Primary & Secondary CTAs: separated with equal breathing room */}
+          <div className="mt-[clamp(1.15rem,2.2vh,1.55rem)] flex flex-wrap items-center justify-center gap-3 sm:gap-3.5">
+            <Button
+              variant="hero-cta"
+              onClick={() => go("order")}
+              className="h-10.5 px-5.5 text-sm font-medium sm:h-11 sm:px-6 sm:text-[15px]"
+            >
+              Create your portrait <Icon name="arrow" className="size-4" />
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={scrollToWorks}
+              className="h-10.5 px-5.5 text-sm font-medium sm:h-11 sm:px-6 sm:text-[15px]"
+            >
+              Explore our works
+            </Button>
+          </div>
         </div>
 
-        {/* Three-Frame Portrait Gallery Composition (Refined & Proportionally Scaled) */}
-        <div className="relative mt-3.5 flex w-full max-w-[820px] items-end justify-center sm:mt-4 lg:mt-5">
+        {/* 4. Three-Frame Portrait Gallery Composition: moved upward with controlled, balanced gap */}
+        <div className="relative mt-[clamp(1.65rem,3.2vh,2.5rem)] flex w-full max-w-[820px] items-end justify-center">
           {/* Ambient soft warm studio glow behind frames */}
           <div
             aria-hidden="true"
