@@ -40,6 +40,20 @@ import {
 
 import { OrderProvider, useOrder } from "./state/OrderContext"
 
+import {
+  orderRepository,
+  type CreateOrderInput,
+  type CustomerTrackingOutput,
+} from "./infrastructure/supabase/repositories/OrderRepository"
+
+import { photoStorageService } from "./infrastructure/supabase/storage/PhotoStorageService"
+
+declare global {
+  interface Window {
+    Razorpay?: any
+  }
+}
+
 import Button from "./components/ui/Button"
 
 import Card from "./components/ui/Card"
@@ -937,8 +951,13 @@ function OrderPhotoPreview({
 }
 
 function Step1() {
-  const { draft, selectPortraitType, setUploadedPhotoUrl, selectSamplePhoto } =
-    useOrder()
+  const {
+    draft,
+    selectPortraitType,
+    setUploadedPhotoUrl,
+    selectSamplePhoto,
+    setUploadedFile,
+  } = useOrder()
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [showSampleModal, setShowSampleModal] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -951,6 +970,7 @@ function Step1() {
       return
     }
     setUploadError(null)
+    setUploadedFile(file)
     setUploadedPhotoUrl(URL.createObjectURL(file), {
       fileName: file.name,
       fileSizeBytes: file.size,
@@ -1111,7 +1131,10 @@ function Step1() {
             {hasPhoto && (
               <button
                 type="button"
-                onClick={() => setUploadedPhotoUrl(null)}
+                onClick={() => {
+                  setUploadedFile(null)
+                  setUploadedPhotoUrl(null)
+                }}
                 className="text-text-secondary hover:text-primary transition-colors text-xs cursor-pointer"
               >
                 Clear photo
@@ -1151,6 +1174,7 @@ function Step1() {
                       type="button"
                       key={s.id}
                       onClick={() => {
+                        setUploadedFile(null)
                         selectSamplePhoto(s.artworkId)
                         selectPortraitType(s.portraitType)
                         setShowSampleModal(false)
@@ -1800,25 +1824,215 @@ function Aside({
   )
 }
 
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") {
+      resolve(false)
+      return
+    }
+    if (window.Razorpay) {
+      resolve(true)
+      return
+    }
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.async = true
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
 function OrderFlow({ go }: { go: (v: RouteId) => void }) {
-  const { draft, step, setStep, pricing } = useOrder()
+  const { draft, step, setStep, pricing, uploadedFile, setConfirmedOrder } =
+    useOrder()
   const [errors, setErrors] = useState<DeliveryValidationErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatusMessage, setSubmitStatusMessage] = useState("")
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [step])
 
-  const next = () => {
+  const next = async () => {
     if (step === 2) {
       const validation = validateDeliveryDetails(draft.delivery)
       setErrors(validation.errors)
       if (!validation.valid) return
     }
     if (step === 3) {
-      go("confirm")
+      await handlePlaceOrder()
       return
     }
     setStep((step + 1) as CheckoutStepIndex)
+  }
+
+  const handlePlaceOrder = async () => {
+    setIsSubmitting(true)
+    setCheckoutError(null)
+    setSubmitStatusMessage("Creating your order...")
+
+    try {
+      const createInput: CreateOrderInput = {
+        portraitType: draft.configuration.portraitType,
+        size: draft.configuration.size,
+        finish: draft.configuration.finish,
+        customer: {
+          fullName: draft.delivery.fullName.trim(),
+          mobile: draft.delivery.mobile.trim(),
+          email: draft.delivery.email?.trim() || undefined,
+        },
+        delivery: {
+          addressLine: draft.delivery.addressLine.trim(),
+          city: draft.delivery.city.trim(),
+          state: draft.delivery.state.trim(),
+          pincode: draft.delivery.pincode.trim(),
+          instructions: draft.delivery.instructions?.trim() || undefined,
+        },
+      }
+
+      const orderRes = await orderRepository.createViaFunction(createInput)
+      if (!orderRes.ok) {
+        setCheckoutError(
+          orderRes.error.message || "Failed to create order. Please try again.",
+        )
+        setIsSubmitting(false)
+        setSubmitStatusMessage("")
+        return
+      }
+
+      const createdOrder = orderRes.value
+
+      // If a custom file was chosen, securely upload to storage
+      if (uploadedFile) {
+        setSubmitStatusMessage("Uploading reference photograph...")
+        const uploadRes = await photoStorageService.uploadSecurely(
+          uploadedFile,
+          createdOrder.trackingToken,
+        )
+
+        if (uploadRes.ok) {
+          setSubmitStatusMessage("Attaching photo to order...")
+          await orderRepository.attachPhoto({
+            trackingToken: createdOrder.trackingToken,
+            storagePath: uploadRes.value.storagePath,
+            originalFilename: uploadRes.value.originalFilename,
+            mimeType: uploadedFile.type,
+            fileSizeBytes: uploadedFile.size,
+          })
+        } else {
+          console.warn("Photo upload notice:", uploadRes.error)
+        }
+      }
+
+      // Create Razorpay payment order
+      setSubmitStatusMessage("Initiating payment gateway...")
+      const rzpRes = await orderRepository.createRazorpayOrder(
+        createdOrder.orderNumber,
+      )
+      if (!rzpRes.ok) {
+        setCheckoutError(
+          rzpRes.error.message ||
+            "Payment initiation failed. Please check gateway configuration.",
+        )
+        setIsSubmitting(false)
+        setSubmitStatusMessage("")
+        return
+      }
+
+      const { razorpayOrderId, razorpayKeyId, advanceAmountPaise, currency } =
+        rzpRes.value
+
+      // Load Razorpay Checkout SDK
+      const scriptReady = await loadRazorpayScript()
+      if (!scriptReady || !window.Razorpay) {
+        setCheckoutError(
+          "Payment gateway could not be loaded. Please check your internet connection.",
+        )
+        setIsSubmitting(false)
+        setSubmitStatusMessage("")
+        return
+      }
+
+      setSubmitStatusMessage("Awaiting payment...")
+
+      const rzp = new window.Razorpay({
+        key: razorpayKeyId,
+        amount: advanceAmountPaise,
+        currency: currency || "INR",
+        name: "Teshart",
+        description: `Advance payment for order ${createdOrder.orderNumber}`,
+        order_id: razorpayOrderId,
+        prefill: {
+          name: draft.delivery.fullName,
+          contact: draft.delivery.mobile,
+          email: draft.delivery.email || undefined,
+        },
+        theme: {
+          color: "#242321",
+        },
+        handler: async (response: {
+          razorpay_order_id: string
+          razorpay_payment_id: string
+          razorpay_signature: string
+        }) => {
+          setSubmitStatusMessage("Verifying payment...")
+          const verifyRes = await orderRepository.verifyPayment({
+            orderNumber: createdOrder.orderNumber,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          })
+
+          if (!verifyRes.ok) {
+            setCheckoutError(
+              `Payment verification failed: ${verifyRes.error.message}`,
+            )
+            setIsSubmitting(false)
+            setSubmitStatusMessage("")
+            return
+          }
+
+          setConfirmedOrder({
+            orderNumber: createdOrder.orderNumber,
+            trackingToken: createdOrder.trackingToken,
+            pricing: createdOrder.pricing,
+          })
+
+          setIsSubmitting(false)
+          setSubmitStatusMessage("")
+          go("confirm")
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false)
+            setSubmitStatusMessage("")
+            setCheckoutError(
+              "Payment window closed. You can retry paying to confirm your order.",
+            )
+          },
+        },
+      })
+
+      rzp.on("payment.failed", (errResp: any) => {
+        console.error("Payment failed:", errResp.error)
+        setCheckoutError(
+          errResp.error?.description || "Payment failed. Please try again.",
+        )
+        setIsSubmitting(false)
+        setSubmitStatusMessage("")
+      })
+
+      rzp.open()
+    } catch (err: any) {
+      console.error("Order placement exception:", err)
+      setCheckoutError(
+        err.message || "An unexpected error occurred during checkout.",
+      )
+      setIsSubmitting(false)
+      setSubmitStatusMessage("")
+    }
   }
 
   const footer = [
@@ -1841,7 +2055,9 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
         formatInr(pricing.totalAmountInr),
         `You'll pay ${formatInr(pricing.advancePayableInr)} now (advance)`,
       ] as const,
-      cta: `Place order and pay ${formatInr(pricing.advancePayableInr)}`,
+      cta: isSubmitting
+        ? submitStatusMessage || "Processing..."
+        : `Place order and pay ${formatInr(pricing.advancePayableInr)}`,
     },
   ][step]
 
@@ -1892,14 +2108,28 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
 
       {/* Fixed Bottom Action Bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg-primary/95 backdrop-blur shadow-lg">
+        {checkoutError && (
+          <div className="bg-error/10 border-b border-error/20 px-4 py-2.5 text-center text-xs text-error font-medium flex items-center justify-center gap-2">
+            <Icon name="info" className="size-4 shrink-0 text-error" />
+            <span>{checkoutError}</span>
+            <button
+              type="button"
+              onClick={() => setCheckoutError(null)}
+              className="ml-2 text-error hover:underline cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
         <Container className="flex items-center justify-between gap-4 py-3 sm:py-3.5">
           <div className="flex items-center gap-3 sm:gap-4">
             {step > 0 && (
               <button
                 type="button"
                 onClick={() => setStep((step - 1) as CheckoutStepIndex)}
+                disabled={isSubmitting}
                 aria-label="Back to previous step"
-                className="grid size-10 place-items-center rounded-lg border border-border-strong bg-white hover:bg-surface-subtle text-primary transition-colors cursor-pointer"
+                className="grid size-10 place-items-center rounded-lg border border-border-strong bg-white hover:bg-surface-subtle text-primary transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Icon name="back" className="size-4.5" />
               </button>
@@ -1923,14 +2153,24 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
           <div className="flex flex-col items-end gap-1">
             <Button
               onClick={next}
-              className="h-10 sm:h-11 px-5 sm:px-6 text-sm font-medium sm:min-w-[240px] cursor-pointer"
+              disabled={isSubmitting}
+              className="h-10 sm:h-11 px-5 sm:px-6 text-sm font-medium sm:min-w-[240px] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {footer.cta} <Icon name="arrow" className="size-4" />
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  {footer.cta}
+                </span>
+              ) : (
+                <>
+                  {footer.cta} <Icon name="arrow" className="size-4" />
+                </>
+              )}
             </Button>
             {step === 3 && (
               <p className="flex items-center gap-1 text-[10px] text-text-secondary">
                 <Icon name="lock" className="size-3 text-text-secondary" />
-                Secure advance payment &bull; Prototype (no real charge)
+                Secure 50% advance payment &bull; 256-bit SSL encrypted
               </p>
             )}
           </div>
@@ -1941,6 +2181,32 @@ function OrderFlow({ go }: { go: (v: RouteId) => void }) {
 }
 
 /* ---------- Post-order ---------- */
+
+function mapStatusToMilestoneIndex(status: string): number {
+  switch (status) {
+    case "ORDER_CONFIRMED":
+    case "PAYMENT_VERIFIED":
+    case "DRAFT":
+    case "CONFIGURED":
+    case "PAYMENT_PENDING":
+      return 0
+    case "ARTWORK_QUEUED":
+      return 1
+    case "IN_PROGRESS":
+      return 2
+    case "QUALITY_CHECK":
+    case "PACKED":
+      return 3
+    case "SHIPPED":
+    case "OUT_FOR_DELIVERY":
+      return 4
+    case "DELIVERED":
+      return 5
+    default:
+      return 0
+  }
+}
+
 function PostOrder({
   mode,
   go,
@@ -1948,10 +2214,59 @@ function PostOrder({
   mode: "confirm" | "track"
   go: (v: RouteId) => void
 }) {
-  const { draft, pricing } = useOrder()
+  const { draft, pricing, confirmedOrder } = useOrder()
   const t = getPortraitType(draft.configuration.portraitType)
   const s = getPortraitSize(draft.configuration.size)
   const f = getFinishOption(draft.configuration.finish)
+
+  const [copied, setCopied] = useState(false)
+  const [tokenInput, setTokenInput] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      return sp.get("track") || sp.get("token") || confirmedOrder?.trackingToken || ""
+    }
+    return confirmedOrder?.trackingToken || ""
+  })
+  const [trackingLoading, setTrackingLoading] = useState(false)
+  const [trackingData, setTrackingData] = useState<CustomerTrackingOutput | null>(null)
+  const [trackingError, setTrackingError] = useState<string | null>(null)
+
+  const orderNum = confirmedOrder?.orderNumber ?? "TSH-240518"
+  const trackingToken = confirmedOrder?.trackingToken ?? ""
+  const trackingUrl = trackingToken
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/?track=${trackingToken}`
+    : ""
+
+  const handleCopy = () => {
+    if (!trackingUrl) return
+    navigator.clipboard?.writeText(trackingUrl).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    })
+  }
+
+  const fetchTracking = async (token: string) => {
+    if (!token.trim()) {
+      setTrackingError("Please enter a tracking token")
+      return
+    }
+    setTrackingLoading(true)
+    setTrackingError(null)
+    const res = await orderRepository.trackViaFunction(token.trim())
+    setTrackingLoading(false)
+    if (!res.ok) {
+      setTrackingError("Order not found or tracking link expired.")
+      setTrackingData(null)
+    } else {
+      setTrackingData(res.value)
+    }
+  }
+
+  useEffect(() => {
+    if (mode === "track" && tokenInput) {
+      fetchTracking(tokenInput)
+    }
+  }, [mode])
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -1979,23 +2294,62 @@ function PostOrder({
                 <em className="italic text-primary font-serif">confirmed.</em>
               </h1>
               <p className="mt-2.5 max-w-md text-sm text-text-secondary leading-relaxed">
-                We&rsquo;ve received your advance payment of{" "}
-                {formatInr(pricing.advancePayableInr)}. Our artist will begin
-                your hand-drawn portrait shortly.
+                We&rsquo;ve received your 50% advance payment of{" "}
+                {formatInr(confirmedOrder?.pricing.advancePayableInr ?? pricing.advancePayableInr)}.
+                Our master portrait artist will begin your hand-drawn artwork shortly.
               </p>
 
               <div className="mt-6 grid max-w-lg gap-3 sm:grid-cols-2">
                 <Card className="p-4 bg-white border border-border shadow-card">
                   <p className="text-xs text-text-secondary">Order reference</p>
                   <p className="mt-1 font-mono font-medium text-primary">
-                    TSH-240518
+                    {orderNum}
                   </p>
                 </Card>
                 <Card className="p-4 bg-white border border-border shadow-card">
                   <p className="text-xs text-text-secondary">Estimated delivery</p>
-                  <p className="mt-1 font-medium text-primary">7–10 days</p>
+                  <p className="mt-1 font-medium text-primary">7–10 business days</p>
                 </Card>
               </div>
+
+              {/* Real-time Order Tracking Link Card */}
+              {trackingUrl && (
+                <div className="mt-4 rounded-xl border border-border bg-surface-subtle/60 p-4 max-w-lg shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-primary flex items-center gap-1.5">
+                      <Icon name="lock" className="size-3.5 text-primary" />
+                      Your Private Order Tracking Link
+                    </p>
+                    <span className="text-[10px] text-text-secondary">Bookmark or save</span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      readOnly
+                      value={trackingUrl}
+                      className="w-full rounded-md border border-border bg-white px-3 py-1.5 text-xs text-text-secondary font-mono truncate select-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCopy}
+                      className="shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-hover transition-colors cursor-pointer"
+                    >
+                      {copied ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                  <div className="mt-2.5 flex items-center justify-between">
+                    <p className="text-[11px] text-text-secondary">
+                      No password required. Anyone with this link can check progress.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => go("track")}
+                      className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                    >
+                      Track now &rarr;
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-4 rounded-xl border border-border bg-white p-4 max-w-lg shadow-card">
                 <p className="text-xs text-text-secondary">Order summary</p>
@@ -2008,24 +2362,24 @@ function PostOrder({
                 <div className="mt-2 flex justify-between border-t border-border pt-2 text-xs">
                   <span className="text-text-secondary">Total amount</span>
                   <span className="font-medium text-primary">
-                    {formatInr(pricing.totalAmountInr)}
+                    {formatInr(confirmedOrder?.pricing.totalAmountInr ?? pricing.totalAmountInr)}
                   </span>
                 </div>
                 <div className="mt-1 flex justify-between text-xs">
-                  <span className="text-text-secondary">Paid now (advance)</span>
+                  <span className="text-text-secondary">Paid now (50% advance)</span>
                   <span className="font-medium text-success">
-                    {formatInr(pricing.advancePayableInr)}
+                    {formatInr(confirmedOrder?.pricing.advancePayableInr ?? pricing.advancePayableInr)}
                   </span>
                 </div>
                 <div className="mt-1 flex justify-between text-xs">
                   <span className="text-text-secondary">Pay on delivery</span>
                   <span className="font-medium text-primary">
-                    {formatInr(pricing.remainingOnDeliveryInr)}
+                    {formatInr(confirmedOrder?.pricing.remainingOnDeliveryInr ?? pricing.remainingOnDeliveryInr)}
                   </span>
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button
                   variant="secondary"
                   onClick={() => go("home")}
@@ -2033,6 +2387,14 @@ function PostOrder({
                 >
                   Back to home
                 </Button>
+                {trackingToken && (
+                  <Button
+                    onClick={() => go("track")}
+                    className="h-11 px-6 cursor-pointer"
+                  >
+                    View order status
+                  </Button>
+                )}
               </div>
             </main>
 
@@ -2046,11 +2408,10 @@ function PostOrder({
                     Real-time status of your commissioned portrait
                   </p>
                 </div>
-                <OrderTimeline current={1} />
+                <OrderTimeline current={0} />
                 <p className="mt-5 text-xs text-text-secondary border-t border-border pt-3 flex items-center gap-1.5">
                   <Icon name="info" className="size-3.5 text-text-secondary shrink-0" />
-                  We&rsquo;ll notify you on WhatsApp &amp; SMS as each milestone
-                  is completed.
+                  We&rsquo;ll update you as each milestone is completed.
                 </p>
               </Card>
             </aside>
@@ -2058,14 +2419,115 @@ function PostOrder({
         ) : (
           <div className="grid gap-8 lg:gap-12 lg:grid-cols-[1.1fr_0.9fr] items-start">
             <main>
-              <Eyebrow>Order TSH-240518</Eyebrow>
+              <Eyebrow>Order Tracking</Eyebrow>
               <h1 className="mt-3 font-serif text-4xl sm:text-5xl leading-[1.05] text-primary">
-                Your portrait is{" "}
-                <em className="italic text-primary font-serif">in progress.</em>
+                Track your{" "}
+                <em className="italic text-primary font-serif">portrait.</em>
               </h1>
               <p className="mt-2.5 text-sm text-text-secondary">
-                Current status: Drawing in progress
+                Enter your private tracking token or link to view live artist progress.
               </p>
+
+              {/* Tracking input form */}
+              <div className="mt-5 max-w-lg flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Paste tracking token or URL..."
+                  value={tokenInput}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    // Extract token if user pasted full URL
+                    if (val.includes("track=")) {
+                      const sp = new URLSearchParams(val.split("?")[1])
+                      setTokenInput(sp.get("track") || val)
+                    } else {
+                      setTokenInput(val)
+                    }
+                  }}
+                  className="flex-1 rounded-lg border border-border bg-white px-3.5 py-2 text-xs font-mono text-primary placeholder:text-text-secondary focus:border-primary focus:outline-none"
+                />
+                <Button
+                  onClick={() => fetchTracking(tokenInput)}
+                  disabled={trackingLoading || !tokenInput.trim()}
+                  className="h-9 px-4 text-xs font-medium cursor-pointer"
+                >
+                  {trackingLoading ? "Looking up..." : "Track"}
+                </Button>
+              </div>
+
+              {trackingError && (
+                <p className="mt-3 text-xs text-error">{trackingError}</p>
+              )}
+
+              {trackingData ? (
+                <div className="mt-6 space-y-4 max-w-lg">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Card className="p-4 bg-white border border-border shadow-card">
+                      <p className="text-xs text-text-secondary">Order reference</p>
+                      <p className="mt-1 font-mono font-medium text-primary">
+                        {trackingData.orderNumber}
+                      </p>
+                    </Card>
+                    <Card className="p-4 bg-white border border-border shadow-card">
+                      <p className="text-xs text-text-secondary">Current status</p>
+                      <p className="mt-1 font-medium text-primary capitalize">
+                        {trackingData.orderStatus.replace(/_/g, " ").toLowerCase()}
+                      </p>
+                    </Card>
+                  </div>
+
+                  <Card className="p-4 bg-white border border-border shadow-card">
+                    <p className="text-xs text-text-secondary mb-2">Artwork Details</p>
+                    <div className="flex justify-between text-xs py-1 border-b border-border">
+                      <span className="text-text-secondary">Portrait Type</span>
+                      <span className="font-medium text-primary capitalize">{trackingData.portraitType}</span>
+                    </div>
+                    <div className="flex justify-between text-xs py-1 border-b border-border">
+                      <span className="text-text-secondary">Size</span>
+                      <span className="font-medium text-primary">{trackingData.size}</span>
+                    </div>
+                    <div className="flex justify-between text-xs py-1">
+                      <span className="text-text-secondary">Finish</span>
+                      <span className="font-medium text-primary capitalize">{trackingData.finish}</span>
+                    </div>
+                  </Card>
+
+                  {trackingData.shipment && (
+                    <Card className="p-4 bg-white border border-border shadow-card">
+                      <p className="text-xs text-text-secondary mb-2">Shipment & Courier</p>
+                      <div className="flex justify-between text-xs py-1 border-b border-border">
+                        <span className="text-text-secondary">Courier</span>
+                        <span className="font-medium text-primary">{trackingData.shipment.courierName}</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1">
+                        <span className="text-text-secondary">Tracking No.</span>
+                        <span className="font-medium text-primary font-mono">{trackingData.shipment.trackingNumber}</span>
+                      </div>
+                      {trackingData.shipment.trackingUrl && (
+                        <a
+                          href={trackingData.shipment.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 block text-xs font-medium text-primary hover:underline"
+                        >
+                          Track on courier website &rarr;
+                        </a>
+                      )}
+                    </Card>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-6 max-w-lg rounded-xl border border-border bg-white p-6 text-center shadow-card">
+                  <Icon name="truck" className="size-8 mx-auto text-muted-element" />
+                  <p className="mt-2 text-xs font-medium text-primary">
+                    Enter your 64-character tracking token above
+                  </p>
+                  <p className="mt-1 text-[11px] text-text-secondary">
+                    Your tracking token was provided when your advance payment was verified.
+                  </p>
+                </div>
+              )}
+
               <div className="mt-6">
                 <Button
                   variant="secondary"
@@ -2081,7 +2543,13 @@ function PostOrder({
                 <p className="mb-4 text-sm font-medium text-primary">
                   Order tracking timeline
                 </p>
-                <OrderTimeline current={2} />
+                <OrderTimeline
+                  current={
+                    trackingData
+                      ? mapStatusToMilestoneIndex(trackingData.orderStatus)
+                      : 0
+                  }
+                />
               </Card>
             </aside>
           </div>
@@ -2266,11 +2734,16 @@ function System({ go }: { go: (v: RouteId) => void }) {
 /* ---------- App Shell & Centralized Router ---------- */
 
 function AppRouter() {
-  const [route, setRoute] = useState<RouteId>(() =>
-    typeof window !== "undefined"
-      ? resolveRouteFromPath(window.location.pathname)
-      : "home",
-  )
+  const [route, setRoute] = useState<RouteId>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      if (sp.get("track") || sp.get("token")) {
+        return "track"
+      }
+      return resolveRouteFromPath(window.location.pathname)
+    }
+    return "home"
+  })
 
   const { setStep } = useOrder()
 

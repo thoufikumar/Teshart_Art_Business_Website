@@ -32,6 +32,17 @@ import {
 
 import { type CheckoutStepIndex } from "../config/routes"
 
+export interface ConfirmedOrderState {
+  orderNumber: string
+  trackingToken: string
+  pricing: {
+    totalAmountInr: number
+    advancePayableInr: number
+    remainingOnDeliveryInr: number
+    currency: string
+  }
+}
+
 export interface OrderContextValue {
   draft: OrderDraft
 
@@ -40,6 +51,10 @@ export interface OrderContextValue {
   pricing: PriceBreakdown
 
   pricingPolicy: PricingPolicy
+
+  confirmedOrder: ConfirmedOrderState | null
+
+  uploadedFile: File | null
 
   setStep: (step: CheckoutStepIndex) => void
 
@@ -54,11 +69,15 @@ export interface OrderContextValue {
     meta?: { fileName?: string; fileSizeBytes?: number; mimeType?: string },
   ) => void
 
+  setUploadedFile: (file: File | null) => void
+
   selectSamplePhoto: (sampleArtworkId: ArtworkId) => void
 
   updateDelivery: (patch: Partial<DeliveryDetails>) => void
 
   selectPaymentMethod: (method: PaymentMethodId) => void
+
+  setConfirmedOrder: (order: ConfirmedOrderState | null) => void
 
   resetDraft: () => void
 }
@@ -77,6 +96,10 @@ export function OrderProvider({
   const [draft, setDraft] = useState<OrderDraft>(INITIAL_ORDER_DRAFT)
 
   const [step, setStep] = useState<CheckoutStepIndex>(0)
+
+  const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrderState | null>(null)
+
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
 
   const selectPortraitType = (portraitType: PortraitTypeId) => {
     setDraft((prev) => ({
@@ -206,6 +229,10 @@ export function OrderProvider({
     setDraft(INITIAL_ORDER_DRAFT)
 
     setStep(0)
+
+    setConfirmedOrder(null)
+
+    setUploadedFile(null)
   }
 
   const pricing = useMemo(
@@ -240,6 +267,10 @@ export function OrderProvider({
 
     pricingPolicy,
 
+    confirmedOrder,
+
+    uploadedFile,
+
     setStep,
 
     selectPortraitType,
@@ -250,11 +281,15 @@ export function OrderProvider({
 
     setUploadedPhotoUrl,
 
+    setUploadedFile,
+
     selectSamplePhoto,
 
     updateDelivery,
 
     selectPaymentMethod,
+
+    setConfirmedOrder,
 
     resetDraft,
   }
